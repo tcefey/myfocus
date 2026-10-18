@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Focus OS - Личный Центр Управления</title>
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#10b981',
+              600: '#059669',
+            },
+            fire: {
+              400: '#fb7185',
+              500: '#f43f5e',
+              600: '#e11d48',
+            },
+            dark: {
+              bg: '#090d16',
+              card: '#121826',
+              cardHover: '#182032',
+              border: '#1f293d',
+              glass: 'rgba(18, 24, 38, 0.75)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    * {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input, textarea, select {
+      user-select: text;
+    }
+    /* Hide scrollbars for slick mobile view */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    body {
+      background-color: #090d16;
+      color: #f1f5f9;
+      overscroll-behavior-y: none;
+    }
+    .glass-card {
+      background: rgba(18, 24, 38, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-nav {
+      background: rgba(9, 13, 22, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .neon-glow-fire {
+      box-shadow: 0 0 25px -5px rgba(244, 63, 94, 0.35);
+    }
+    .neon-glow-cyan {
+      box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.3);
+    }
+    .neon-glow-emerald {
+      box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.35);
+    }
+    .progress-ring-circle {
+      transition: stroke-dashoffset 0.8s ease-in-out;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+  </style>
+</head>
+<body class="bg-dark-bg text-slate-100 min-h-screen pb-28 pt-2">
+
+  <!-- TOP HEADER -->
+  <header class="px-5 pt-3 pb-3 flex items-center justify-between sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md">
+    <div class="flex items-center space-x-3">
+      <div class="relative">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-fuchsia-500 p-[2px] shadow-lg">
+          <div class="w-full h-full bg-dark-card rounded-[14px] flex items-center justify-center font-extrabold text-sm text-cyan-400">
+            ⚡
+          </div>
+        </div>
+        <span class="absolute -top-1 -right-1 flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+        </span>
+      </div>
+      <div>
+        <h1 class="text-xs uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1.5">
+          <span>Personal OS</span>
+          <span class="px-1.5 py-0.5 rounded-full text-[9px] bg-cyan-950/80 text-cyan-400 border border-cyan-800/40">PRO</span>
+        </h1>
+        <p id="user-greeting" class="text-base font-bold text-white tracking-tight">Привет, Чемпион!</p>
+      </div>
+    </div>
+
+    <!-- Quick Action / Add Task button -->
+    <button onclick="openAddTaskModal()" class="w-9 h-9 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/25 active:scale-95 transition-transform">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+    </button>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="px-4 max-w-lg mx-auto space-y-5">
+
+    <!-- TAB 1: DASHBOARD (ОБЗОР) -->
+    <section id="tab-dashboard" class="space-y-5">
+
+      <!-- HERO STATS CARD -->
+      <div class="glass-card rounded-3xl p-5 relative overflow-hidden neon-glow-cyan">
+        <div class="absolute -right-8 -top-8 w-36 h-36 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -left-8 -bottom-8 w-36 h-36 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-xs text-slate-400 font-medium">Прогресс сегодня</span>
+            <div class="flex items-baseline space-x-2 mt-0.5">
+              <span id="stat-percent-today" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-300">0%</span>
+              <span id="stat-completed-fraction" class="text-xs text-slate-400 font-semibold">0/0 выполнено</span>
+            </div>
+          </div>
+          
+          <!-- Circular Progress Ring -->
+          <div class="relative w-16 h-16 flex items-center justify-center">
+            <svg class="w-16 h-16 transform -rotate-90">
+              <circle cx="32" cy="32" r="26" stroke="#1e293b" stroke-width="5" fill="transparent"/>
+              <circle id="hero-progress-circle" cx="32" cy="32" r="26" stroke="url(#cyan-grad)" stroke-width="5" fill="transparent"
+                stroke-dasharray="163.36" stroke-dashoffset="163.36" stroke-linecap="round" class="progress-ring-circle"/>
+              <defs>
+                <linearGradient id="cyan-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#38bdf8" />
+                  <stop offset="100%" stop-color="#818cf8" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <span id="hero-circle-text" class="absolute text-[11px] font-bold text-cyan-300">0%</span>
+          </div>
+        </div>
+
+        <!-- 3 KPI METRICS TILES -->
+        <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-800/80">
+          <div class="bg-dark-card/60 rounded-2xl p-2.5 text-center border border-slate-800">
+            <div class="text-[10px] text-slate-400 font-medium">Висит всего</div>
+            <div id="stat-pending-count" class="text-lg font-extrabold text-white mt-0.5">0</div>
+          </div>
+          <div class="bg-dark-card/60 rounded-2xl p-2.5 text-center border border-fire-500/20 bg-fire-500/5">
+            <div class="text-[10px] text-rose-400 font-semibold flex items-center justify-center gap-1">
+              <span>🔥</span> Горит
+            </div>
+            <div id="stat-burning-count" class="text-lg font-extrabold text-rose-400 mt-0.5">0</div>
+          </div>
+          <div class="bg-dark-card/60 rounded-2xl p-2.5 text-center border border-slate-800">
+            <div class="text-[10px] text-emerald-400 font-medium">Закрыто</div>
+            <div id="stat-done-count" class="text-lg font-extrabold text-emerald-400 mt-0.5">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: "ЧТО ГОРИТ 🔥" (BURNING & URGENT) -->
+      <div id="burning-section" class="space-y-2.5">
+        <div class="flex items-center justify-between px-1">
+          <div class="flex items-center space-x-2">
+            <span class="flex h-2.5 w-2.5 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+            </span>
+            <h2 class="text-sm font-bold text-white tracking-wide uppercase flex items-center gap-1.5">
+              <span>В огне дедлайны</span>
+              <span class="text-xs">🔥</span>
+            </h2>
+          </div>
+          <span id="burning-badge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+            0 задач
+          </span>
+        </div>
+
+        <div id="burning-tasks-list" class="space-y-2.5">
+          <!-- Dynamic cards injected via JS -->
+        </div>
+      </div>
+
+      <!-- SECTION: "СЕГОДНЯ В ПЛАНАХ 🎯" -->
+      <div class="space-y-2.5">
+        <div class="flex items-center justify-between px-1">
+          <h2 class="text-sm font-bold text-white tracking-wide uppercase flex items-center gap-2">
+            <span>🎯</span> План на сегодня
+          </h2>
+          <button onclick="switchTab('tasks', 'today')" class="text-xs text-cyan-400 font-semibold hover:underline">
+            Все задачи →
+          </button>
+        </div>
+
+        <div id="today-tasks-list" class="space-y-2.5">
+          <!-- Dynamic cards injected via JS -->
+        </div>
+      </div>
+
+      <!-- SECTION: ПРОГРЕСС ЦЕЛЕЙ (GOALS PREVIEW) -->
+      <div class="glass-card rounded-3xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-sm">🏆</span>
+            <h3 class="text-sm font-bold text-white">Стратегические цели</h3>
+          </div>
+          <button onclick="switchTab('goals')" class="text-xs text-cyan-400 font-semibold hover:underline">
+            Подробнее →
+          </button>
+        </div>
+        <div id="dashboard-goals-list" class="space-y-2.5">
+          <!-- Goals injected via JS -->
+        </div>
+      </div>
+
+      <!-- SECTION: ТРЕК ПРИВЫЧЕК (QUICK STREAKS) -->
+      <div class="glass-card rounded-3xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-sm">⚡</span>
+            <h3 class="text-sm font-bold text-white">Ежедневный фокус и треки</h3>
+          </div>
+          <button onclick="switchTab('tracks')" class="text-xs text-cyan-400 font-semibold hover:underline">
+            Трекер →
+          </button>
+        </div>
+        <div id="dashboard-habits-list" class="grid grid-cols-2 gap-2">
+          <!-- Habits mini cards -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: TASKS (ВСЕ ЗАДАЧИ С ФИЛЬТРАМИ) -->
+    <section id="tab-tasks" class="space-y-4 hidden">
+      <!-- Search & Filters -->
+      <div class="space-y-3">
+        <!-- Search bar -->
+        <div class="relative">
+          <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" id="task-search-input" oninput="renderTasksTab()" placeholder="Поиск задач или заметок..." 
+            class="w-full bg-dark-card border border-dark-border rounded-2xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors">
+        </div>
+
+        <!-- Filter Pills Horizontal Scroll -->
+        <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs font-semibold">
+          <button onclick="setTaskFilter('all')" id="filter-pill-all" class="px-3.5 py-1.5 rounded-xl bg-cyan-500 text-white shadow-sm flex-shrink-0 transition-all">Все</button>
+          <button onclick="setTaskFilter('burning')" id="filter-pill-burning" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-rose-400 flex items-center gap-1 flex-shrink-0 transition-all">🔥 Горит</button>
+          <button onclick="setTaskFilter('today')" id="filter-pill-today" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all">Сегодня</button>
+          <button onclick="setTaskFilter('week')" id="filter-pill-week" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all">На неделю</button>
+          <button onclick="setTaskFilter('completed')" id="filter-pill-completed" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-400 flex-shrink-0 transition-all">Выполнено</button>
+        </div>
+      </div>
+
+      <!-- Tasks List -->
+      <div id="full-tasks-list" class="space-y-2.5">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- TAB 3: MATRIX (МАТРИЦА ЭЙЗЕНХАУЭРА) -->
+    <section id="tab-matrix" class="space-y-4 hidden">
+      <div class="glass-card rounded-2xl p-4 border border-slate-800">
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <span>🎯</span> Матрица Эйзенхауэра
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">Разделение задач по важности и срочности для максимальной продуктивности.</p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-3">
+        <!-- Q1: Срочно и Важно (Сделать сейчас!) -->
+        <div class="glass-card rounded-3xl p-4 border border-rose-500/30 bg-rose-500/5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-rose-400 uppercase tracking-wide flex items-center gap-1.5">
+              <span>🔥</span> 1. Срочно & Важно
+            </span>
+            <span id="matrix-count-q1" class="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold">0</span>
+          </div>
+          <div id="matrix-list-q1" class="space-y-2"></div>
+        </div>
+
+        <!-- Q2: Не срочно, но Важно (Стратегия и Рост) -->
+        <div class="glass-card rounded-3xl p-4 border border-indigo-500/30 bg-indigo-500/5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wide flex items-center gap-1.5">
+              <span>💎</span> 2. Не срочно & Важно
+            </span>
+            <span id="matrix-count-q2" class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold">0</span>
+          </div>
+          <div id="matrix-list-q2" class="space-y-2"></div>
+        </div>
+
+        <!-- Q3: Срочно, но Не важно (Делегировать) -->
+        <div class="glass-card rounded-3xl p-4 border border-amber-500/30 bg-amber-500/5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-wide flex items-center gap-1.5">
+              <span>⚡</span> 3. Срочно & Не важно
+            </span>
+            <span id="matrix-count-q3" class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold">0</span>
+          </div>
+          <div id="matrix-list-q3" class="space-y-2"></div>
+        </div>
+
+        <!-- Q4: Не срочно и Не важно (Минимизировать) -->
+        <div class="glass-card rounded-3xl p-4 border border-slate-700/50 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
+              <span>☕</span> 4. Не срочно & Не важно
+            </span>
+            <span id="matrix-count-q4" class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-bold">0</span>
+          </div>
+          <div id="matrix-list-q4" class="space-y-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: GOALS (ЦЕЛИ И ПЛАНЫ) -->
+    <section id="tab-goals" class="space-y-4 hidden">
+      <div class="flex items-center justify-between px-1">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <span>🏆</span> Мои Главные Цели
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Долгосрочные цели и автоматический расчет прогресса</p>
+        </div>
+        <button onclick="openAddGoalModal()" class="px-3 py-1.5 rounded-xl bg-cyan-500 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-cyan-500/20 active:scale-95 transition-transform">
+          <span>+ Цель</span>
+        </button>
+      </div>
+
+      <div id="goals-full-list" class="space-y-3.5">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- TAB 5: TRACKS (ПРИВЫЧКИ И POMODORO ФОКУС) -->
+    <section id="tab-tracks" class="space-y-5 hidden">
+      
+      <!-- POMODORO TIMER CARD -->
+      <div class="glass-card rounded-3xl p-5 text-center relative overflow-hidden neon-glow-cyan">
+        <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Фокус Сессия (Pomodoro)</span>
+        <div class="my-4">
+          <span id="pomo-timer-display" class="text-5xl font-black tracking-tight text-white font-mono">25:00</span>
+        </div>
+        
+        <div class="flex items-center justify-center space-x-3">
+          <button id="pomo-toggle-btn" onclick="togglePomodoro()" class="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm shadow-lg shadow-cyan-500/30 active:scale-95 transition-transform">
+            Старт
+          </button>
+          <button onclick="resetPomodoro()" class="px-4 py-2.5 rounded-2xl bg-dark-card border border-dark-border text-slate-300 font-semibold text-sm active:scale-95 transition-transform">
+            Сброс
+          </button>
+        </div>
+        <div class="mt-3 flex items-center justify-center space-x-4 text-xs text-slate-400">
+          <span>Сессий сегодня: <b id="pomo-count" class="text-cyan-400">0</b></span>
+          <span>•</span>
+          <span>Режим: <b>25 мин работы</b></span>
+        </div>
+      </div>
+
+      <!-- HABITS TRACKER -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>🔥</span> Трекер Привычек
+            </h3>
+            <p class="text-xs text-slate-400">Стрики непрерывного прогресса</p>
+          </div>
+          <button onclick="openAddHabitModal()" class="px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition-transform">
+            + Привычка
+          </button>
+        </div>
+
+        <div id="habits-full-list" class="space-y-3">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION BAR (FIXED) -->
+  <nav class="fixed bottom-0 left-0 right-0 glass-nav z-50 px-3 py-2 max-w-lg mx-auto">
+    <div class="grid grid-cols-5 gap-1 text-center">
+      <!-- 1. Dashboard -->
+      <button onclick="switchTab('dashboard')" id="nav-btn-dashboard" class="flex flex-col items-center py-1.5 px-1 text-cyan-400 transition-colors">
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+        <span class="text-[10px] font-bold">Обзор</span>
+      </button>
+
+      <!-- 2. Tasks -->
+      <button onclick="switchTab('tasks')" id="nav-btn-tasks" class="flex flex-col items-center py-1.5 px-1 text-slate-400 hover:text-slate-200 transition-colors">
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+        <span class="text-[10px] font-bold">Задачи</span>
+      </button>
+
+      <!-- 3. Matrix -->
+      <button onclick="switchTab('matrix')" id="nav-btn-matrix" class="flex flex-col items-center py-1.5 px-1 text-slate-400 hover:text-slate-200 transition-colors">
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+        <span class="text-[10px] font-bold">Матрица</span>
+      </button>
+
+      <!-- 4. Goals -->
+      <button onclick="switchTab('goals')" id="nav-btn-goals" class="flex flex-col items-center py-1.5 px-1 text-slate-400 hover:text-slate-200 transition-colors">
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+        <span class="text-[10px] font-bold">Цели</span>
+      </button>
+
+      <!-- 5. Tracks -->
+      <button onclick="switchTab('tracks')" id="nav-btn-tracks" class="flex flex-col items-center py-1.5 px-1 text-slate-400 hover:text-slate-200 transition-colors">
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        <span class="text-[10px] font-bold">Треки</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MODAL: ADD / EDIT TASK -->
+  <div id="modal-task" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+    <div class="bg-dark-card border border-dark-border w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 id="modal-task-title" class="text-base font-bold text-white">Новая задача</h3>
+        <button onclick="closeTaskModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Название задачи *</label>
+          <input type="text" id="task-title-input" placeholder="Например: Запустить рекламу" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Заметка / Детали</label>
+          <textarea id="task-note-input" rows="2" placeholder="Дополнительные детали..." class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Срочность (Приоритет)</label>
+            <select id="task-priority-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+              <option value="p1">🔥 P1 — Горит / Срочно</option>
+              <option value="p2" selected>⭐ P2 — Важно</option>
+              <option value="p3">📅 P3 — Обычный</option>
+              <option value="p4">☕ P4 — Низкий</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Дедлайн</label>
+            <input type="date" id="task-due-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Категория</label>
+            <select id="task-category-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+              <option value="Работа">💼 Работа</option>
+              <option value="Цели">🏆 Личные цели</option>
+              <option value="Здоровье">⚡ Здоровье и спорт</option>
+              <option value="Финансы">💰 Финансы</option>
+              <option value="Разное">📦 Разное</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Привязка к Цели</label>
+            <select id="task-goal-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+              <option value="">Без цели</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 flex items-center space-x-3">
+        <button onclick="saveTaskFromModal()" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm shadow-lg shadow-cyan-500/25 active:scale-95 transition-transform">
+          Сохранить задачу
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD GOAL -->
+  <div id="modal-goal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+    <div class="bg-dark-card border border-dark-border w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white">Новая Глобальная Цель</h3>
+        <button onclick="closeGoalModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Название цели *</label>
+          <input type="text" id="goal-title-input" placeholder="Например: Запустить онлайн-школу" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Целевой дедлайн</label>
+          <input type="date" id="goal-due-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Иконка / Эмодзи</label>
+          <input type="text" id="goal-icon-input" value="🚀" class="w-20 bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-center text-lg text-white">
+        </div>
+      </div>
+      <button onclick="saveGoalFromModal()" class="w-full py-3 rounded-2xl bg-cyan-500 text-white font-bold text-sm shadow-lg shadow-cyan-500/25 active:scale-95 transition-transform">
+        Создать цель
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD HABIT -->
+  <div id="modal-habit" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+    <div class="bg-dark-card border border-dark-border w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white">Новая Привычка для Трекинга</h3>
+        <button onclick="closeHabitModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Название привычки *</label>
+          <input type="text" id="habit-title-input" placeholder="Например: Чтение 30 минут" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Иконка / Эмодзи</label>
+          <input type="text" id="habit-icon-input" value="📚" class="w-20 bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-center text-lg text-white">
+        </div>
+      </div>
+      <button onclick="saveHabitFromModal()" class="w-full py-3 rounded-2xl bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition-transform">
+        Начать трек
+      </button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    // --- TELEGRAM WEB APP INIT ---
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      try {
+        if (tg.initDataUnsafe?.user?.first_name) {
+          document.getElementById('user-greeting').textContent = `Привет, ${tg.initDataUnsafe.user.first_name}!`;
+        }
+      } catch (e) {}
+    }
+
+    // Haptic feedback helper
+    function triggerHaptic(type = 'light') {
+      try {
+        if (tg?.HapticFeedback) {
+          if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
+          else if (type === 'heavy') tg.HapticFeedback.impactOccurred('heavy');
+          else tg.HapticFeedback.impactOccurred('medium');
+        }
+      } catch (e) {}
+    }
+
+    // --- STATE INITIALIZATION WITH SAMPLE DATA ---
+    const STORAGE_KEY_TASKS = 'focus_os_tasks_v1';
+    const STORAGE_KEY_GOALS = 'focus_os_goals_v1';
+    const STORAGE_KEY_HABITS = 'focus_os_habits_v1';
+
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    const DEFAULT_GOALS = [
+      { id: 'g1', title: 'Запустить личный проект', icon: '🚀', due: '2026-11-30', completed: false },
+      { id: 'g2', title: 'Физическая форма и спорт', icon: '⚡', due: '2026-12-31', completed: false }
+    ];
+
+    const DEFAULT_HABITS = [
+      { id: 'h1', title: 'Фокус-работа 2ч', icon: '🧠', streak: 5, lastDoneDate: todayStr },
+      { id: 'h2', title: 'Тренировка / Зарядка', icon: '💪', streak: 3, lastDoneDate: '' },
+      { id: 'h3', title: 'Чтение книги 20 мин', icon: '📖', streak: 7, lastDoneDate: todayStr },
+      { id: 'h4', title: 'План на следующий день', icon: '📝', streak: 12, lastDoneDate: '' }
+    ];
+
+    const DEFAULT_TASKS = [
+      { id: 't1', title: 'Закрыть срочные согласования', note: 'Критично сделать до обеда', priority: 'p1', due: todayStr, category: 'Работа', goalId: 'g1', completed: false },
+      { id: 't2', title: 'Оплатить сервер и домены', note: 'Истекает сегодня', priority: 'p1', due: todayStr, category: 'Финансы', goalId: '', completed: false },
+      { id: 't3', title: 'Провести стратегический созвон', note: 'Обсудить спринт и метрики', priority: 'p2', due: todayStr, category: 'Работа', goalId: 'g1', completed: false },
+      { id: 't4', title: 'Тренировка в зале 1.5ч', note: 'Грудь и плечи', priority: 'p2', due: todayStr, category: 'Здоровье', goalId: 'g2', completed: true },
+      { id: 't5', title: 'Подготовить отчет за неделю', note: 'Собрать аналитику', priority: 'p3', due: getOffsetDate(3), category: 'Работа', goalId: '', completed: false },
+      { id: 't6', title: 'Разобрать почту и отписаться от спама', note: 'Рутина', priority: 'p4', due: getOffsetDate(5), category: 'Разное', goalId: '', completed: false }
+    ];
+
+    function getOffsetDate(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split('T')[0];
+    }
+
+    let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || DEFAULT_TASKS;
+    let goals = JSON.parse(localStorage.getItem(STORAGE_KEY_GOALS)) || DEFAULT_GOALS;
+    let habits = JSON.parse(localStorage.getItem(STORAGE_KEY_HABITS)) || DEFAULT_HABITS;
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
+      localStorage.setItem(STORAGE_KEY_GOALS, JSON.stringify(goals));
+      localStorage.setItem(STORAGE_KEY_HABITS, JSON.stringify(habits));
+    }
+
+    // --- TAB SWITCHING ---
+    let currentTab = 'dashboard';
+    let currentTaskFilter = 'all';
+
+    function switchTab(tabName, taskFilter = null) {
+      triggerHaptic('light');
+      currentTab = tabName;
+      ['dashboard', 'tasks', 'matrix', 'goals', 'tracks'].forEach(t => {
+        const el = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`nav-btn-${t}`);
+        if (t === tabName) {
+          el.classList.remove('hidden');
+          btn.classList.add('text-cyan-400');
+          btn.classList.remove('text-slate-400');
+        } else {
+          el.classList.add('hidden');
+          btn.classList.remove('text-cyan-400');
+          btn.classList.add('text-slate-400');
+        }
+      });
+
+      if (tabName === 'tasks') {
+        if (taskFilter) setTaskFilter(taskFilter);
+        else renderTasksTab();
+      } else if (tabName === 'matrix') {
+        renderMatrixTab();
+      } else if (tabName === 'goals') {
+        renderGoalsTab();
+      } else if (tabName === 'tracks') {
+        renderTracksTab();
+      } else {
+        renderDashboard();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- DASHBOARD RENDERING ---
+    function renderDashboard() {
+      const nowStr = new Date().toISOString().split('T')[0];
+      const todayTasks = tasks.filter(t => t.due === nowStr);
+      const todayDone = todayTasks.filter(t => t.completed).length;
+      const todayTotal = todayTasks.length;
+      const todayPercent = todayTotal > 0 ? Math.round((todayDone / todayTotal) * 100) : 0;
+
+      // Stats
+      document.getElementById('stat-percent-today').textContent = `${todayPercent}%`;
+      document.getElementById('stat-completed-fraction').textContent = `${todayDone}/${todayTotal} выполнено`;
+      document.getElementById('hero-circle-text').textContent = `${todayPercent}%`;
+
+      // Circular ring offset: radius=26 => 2*pi*r ≈ 163.36
+      const circle = document.getElementById('hero-progress-circle');
+      const offset = 163.36 - (163.36 * todayPercent) / 100;
+      circle.style.strokeDashoffset = offset;
+
+      // KPIs
+      const pendingTotal = tasks.filter(t => !t.completed).length;
+      const doneTotal = tasks.filter(t => t.completed).length;
+      const burningTasks = tasks.filter(t => !t.completed && (t.priority === 'p1' || (t.due && t.due <= nowStr)));
+      
+      document.getElementById('stat-pending-count').textContent = pendingTotal;
+      document.getElementById('stat-burning-count').textContent = burningTasks.length;
+      document.getElementById('stat-done-count').textContent = doneTotal;
+
+      // Burning Section
+      const burningContainer = document.getElementById('burning-tasks-list');
+      const burningBadge = document.getElementById('burning-badge');
+      burningBadge.textContent = `${burningTasks.length} ${getNoun(burningTasks.length, 'задача', 'задачи', 'задач')}`;
+
+      if (burningTasks.length === 0) {
+        burningContainer.innerHTML = `
+          <div class="glass-card rounded-2xl p-4 text-center text-xs text-slate-400 border border-slate-800">
+            ✨ Всё спокойно! Горящих задач нет, дедлайны под контролем.
+          </div>
+        `;
+      } else {
+        burningContainer.innerHTML = burningTasks.map(t => createTaskCardHTML(t, true)).join('');
+      }
+
+      // Today Section
+      const todayContainer = document.getElementById('today-tasks-list');
+      if (todayTasks.length === 0) {
+        todayContainer.innerHTML = `
+          <div class="glass-card rounded-2xl p-4 text-center text-xs text-slate-400 border border-slate-800">
+            На сегодня задач нет. Нажмите <b>+</b> вверху, чтобы добавить!
+          </div>
+        `;
+      } else {
+        todayContainer.innerHTML = todayTasks.map(t => createTaskCardHTML(t)).join('');
+      }
+
+      // Goals in Dashboard
+      const goalsContainer = document.getElementById('dashboard-goals-list');
+      goalsContainer.innerHTML = goals.slice(0, 2).map(g => {
+        const goalTasks = tasks.filter(t => t.goalId === g.id);
+        const gDone = goalTasks.filter(t => t.completed).length;
+        const gTotal = goalTasks.length;
+        const gPct = gTotal > 0 ? Math.round((gDone / gTotal) * 100) : 0;
+        return `
+          <div class="bg-dark-bg/60 border border-dark-border rounded-2xl p-3">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="font-bold text-white flex items-center gap-1.5">
+                <span>${g.icon}</span> ${escapeHtml(g.title)}
+              </span>
+              <span class="text-cyan-400 font-bold">${gPct}%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full transition-all duration-500" style="width: ${gPct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Habits in Dashboard
+      const habitsContainer = document.getElementById('dashboard-habits-list');
+      habitsContainer.innerHTML = habits.slice(0, 4).map(h => {
+        const isDoneToday = h.lastDoneDate === nowStr;
+        return `
+          <div onclick="toggleHabit('${h.id}')" class="bg-dark-bg/60 border ${isDoneToday ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-dark-border'} rounded-2xl p-2.5 flex items-center justify-between cursor-pointer active:scale-95 transition-all">
+            <div class="flex items-center space-x-2">
+              <span class="text-base">${h.icon}</span>
+              <div class="overflow-hidden">
+                <div class="text-xs font-bold text-white truncate">${escapeHtml(h.title)}</div>
+                <div class="text-[10px] text-amber-400 font-semibold flex items-center gap-0.5">
+                  <span>🔥</span> ${h.streak} дн.
+                </div>
+              </div>
+            </div>
+            <div class="w-6 h-6 rounded-lg ${isDoneToday ? 'bg-emerald-500 text-white' : 'border border-slate-700 text-transparent'} flex items-center justify-center text-xs">
+              ✓
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Task Card Component
+    function createTaskCardHTML(t, isBurning = false) {
+      const isOverdue = t.due && t.due < todayStr && !t.completed;
+      const priorityBadge = getPriorityBadge(t.priority);
+
+      return `
+        <div class="glass-card rounded-2xl p-3.5 border ${isBurning ? 'border-rose-500/30 bg-rose-500/5' : 'border-slate-800/80'} flex items-start justify-between space-x-3 transition-all duration-200">
+          <button onclick="toggleTask('${t.id}')" class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-xl border-2 ${t.completed ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/50' : 'border-slate-600 hover:border-cyan-400'} flex items-center justify-center transition-all">
+            ${t.completed ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+          </button>
+          
+          <div class="flex-1 min-w-0" onclick="toggleTask('${t.id}')">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm font-bold text-white ${t.completed ? 'line-through text-slate-500' : ''}">${escapeHtml(t.title)}</span>
+            </div>
+            ${t.note ? `<p class="text-xs text-slate-400 mt-0.5 line-clamp-1">${escapeHtml(t.note)}</p>` : ''}
+            
+            <div class="flex flex-wrap items-center gap-1.5 mt-2">
+              ${priorityBadge}
+              ${t.category ? `<span class="px-2 py-0.5 rounded-md text-[10px] bg-slate-800 text-slate-300 font-medium">${t.category}</span>` : ''}
+              ${t.due ? `
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold flex items-center gap-1 ${isOverdue ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-slate-800/60 text-slate-400'}">
+                  📅 ${formatDate(t.due)}
+                </span>
+              ` : ''}
+            </div>
+          </div>
+
+          <button onclick="deleteTask('${t.id}')" class="text-slate-600 hover:text-rose-400 p-1 flex-shrink-0 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>
+        </div>
+      `;
+    }
+
+    function getPriorityBadge(p) {
+      if (p === 'p1') return '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">🔥 P1 Срочно</span>';
+      if (p === 'p2') return '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">⭐ P2 Важно</span>';
+      if (p === 'p3') return '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-cyan-500/20 text-cyan-300">P3 Обычный</span>';
+      return '<span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-800 text-slate-400">P4 Низкий</span>';
+    }
+
+    // --- TASKS TAB RENDERING ---
+    function setTaskFilter(filter) {
+      triggerHaptic('light');
+      currentTaskFilter = filter;
+      ['all', 'burning', 'today', 'week', 'completed'].forEach(f => {
+        const btn = document.getElementById(`filter-pill-${f}`);
+        if (f === filter) {
+          btn.className = 'px-3.5 py-1.5 rounded-xl bg-cyan-500 text-white shadow-sm flex-shrink-0 transition-all font-bold';
+        } else {
+          btn.className = 'px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all font-medium';
+        }
+      });
+      renderTasksTab();
+    }
+
+    function renderTasksTab() {
+      const search = (document.getElementById('task-search-input')?.value || '').toLowerCase();
+      const listEl = document.getElementById('full-tasks-list');
+      const nowStr = new Date().toISOString().split('T')[0];
+      const nextWeekStr = getOffsetDate(7);
+
+      let filtered = tasks.filter(t => {
+        if (search && !t.title.toLowerCase().includes(search) && !t.note?.toLowerCase().includes(search)) return false;
+        if (currentTaskFilter === 'burning') return !t.completed && (t.priority === 'p1' || (t.due && t.due <= nowStr));
+        if (currentTaskFilter === 'today') return t.due === nowStr;
+        if (currentTaskFilter === 'week') return t.due && t.due >= nowStr && t.due <= nextWeekStr;
+        if (currentTaskFilter === 'completed') return t.completed;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-sm border border-slate-800">
+            🔍 Задач по данному фильтру не найдено
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(t => createTaskCardHTML(t)).join('');
+    }
+
+    // --- MATRIX TAB RENDERING ---
+    function renderMatrixTab() {
+      const q1 = tasks.filter(t => !t.completed && t.priority === 'p1');
+      const q2 = tasks.filter(t => !t.completed && t.priority === 'p2');
+      const q3 = tasks.filter(t => !t.completed && t.priority === 'p3');
+      const q4 = tasks.filter(t => !t.completed && t.priority === 'p4');
+
+      document.getElementById('matrix-count-q1').textContent = q1.length;
+      document.getElementById('matrix-count-q2').textContent = q2.length;
+      document.getElementById('matrix-count-q3').textContent = q3.length;
+      document.getElementById('matrix-count-q4').textContent = q4.length;
+
+      document.getElementById('matrix-list-q1').innerHTML = q1.length ? q1.map(t => createTaskCardHTML(t)).join('') : '<p class="text-[11px] text-slate-500">Пусто</p>';
+      document.getElementById('matrix-list-q2').innerHTML = q2.length ? q2.map(t => createTaskCardHTML(t)).join('') : '<p class="text-[11px] text-slate-500">Пусто</p>';
+      document.getElementById('matrix-list-q3').innerHTML = q3.length ? q3.map(t => createTaskCardHTML(t)).join('') : '<p class="text-[11px] text-slate-500">Пусто</p>';
+      document.getElementById('matrix-list-q4').innerHTML = q4.length ? q4.map(t => createTaskCardHTML(t)).join('') : '<p class="text-[11px] text-slate-500">Пусто</p>';
+    }
+
+    // --- GOALS TAB RENDERING ---
+    function renderGoalsTab() {
+      const container = document.getElementById('goals-full-list');
+      if (goals.length === 0) {
+        container.innerHTML = `
+          <div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-sm">
+            У вас пока нет целей. Нажмите <b>+ Цель</b>, чтобы задать вектор!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = goals.map(g => {
+        const goalTasks = tasks.filter(t => t.goalId === g.id);
+        const gDone = goalTasks.filter(t => t.completed).length;
+        const gTotal = goalTasks.length;
+        const gPct = gTotal > 0 ? Math.round((gDone / gTotal) * 100) : 0;
+
+        return `
+          <div class="glass-card rounded-3xl p-5 border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <span class="text-3xl">${g.icon}</span>
+                <div>
+                  <h3 class="text-base font-bold text-white">${escapeHtml(g.title)}</h3>
+                  <p class="text-xs text-slate-400">Дедлайн: ${g.due ? formatDate(g.due) : 'Не задан'}</p>
+                </div>
+              </div>
+              <span class="text-lg font-black text-cyan-400">${gPct}%</span>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-gradient-to-r from-cyan-500 via-indigo-500 to-fuchsia-500 h-full rounded-full transition-all duration-500" style="width: ${gPct}%"></div>
+            </div>
+
+            <!-- Subtasks preview -->
+            <div class="pt-2 border-t border-slate-800/80">
+              <div class="text-xs font-semibold text-slate-400 mb-2 flex items-center justify-between">
+                <span>Связанные задачи (${gDone}/${gTotal})</span>
+                <button onclick="openAddTaskModal('${g.id}')" class="text-cyan-400 hover:underline">+ Добавить задачу</button>
+              </div>
+              <div class="space-y-1.5">
+                ${goalTasks.slice(0, 3).map(t => `
+                  <div onclick="toggleTask('${t.id}')" class="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
+                    <span class="${t.completed ? 'text-emerald-400' : 'text-slate-600'}">●</span>
+                    <span class="${t.completed ? 'line-through text-slate-500' : ''}">${escapeHtml(t.title)}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- TRACKS & HABITS RENDERING ---
+    function renderTracksTab() {
+      const container = document.getElementById('habits-full-list');
+      const nowStr = new Date().toISOString().split('T')[0];
+
+      container.innerHTML = habits.map(h => {
+        const isDoneToday = h.lastDoneDate === nowStr;
+        return `
+          <div class="glass-card rounded-2xl p-4 border ${isDoneToday ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-slate-800'} flex items-center justify-between">
+            <div class="flex items-center space-x-3.5">
+              <span class="text-2xl">${h.icon}</span>
+              <div>
+                <h4 class="text-sm font-bold text-white">${escapeHtml(h.title)}</h4>
+                <div class="flex items-center space-x-2 text-xs mt-0.5">
+                  <span class="text-amber-400 font-bold flex items-center gap-0.5">
+                    <span>🔥</span> Стрик: ${h.streak} ${getNoun(h.streak, 'день', 'дня', 'дней')} подряд
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="toggleHabit('${h.id}')" class="px-4 py-2 rounded-xl ${isDoneToday ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-dark-card border border-slate-700 text-slate-300 hover:border-emerald-400'} text-xs font-bold active:scale-95 transition-all">
+              ${isDoneToday ? '✓ Готово' : 'Отметить'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- ACTIONS: TOGGLE, DELETE, ADD ---
+    function toggleTask(id) {
+      triggerHaptic('success');
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        task.completed = !task.completed;
+        saveState();
+        refreshCurrentView();
+      }
+    }
+
+    function deleteTask(id) {
+      triggerHaptic('heavy');
+      tasks = tasks.filter(t => t.id !== id);
+      saveState();
+      refreshCurrentView();
+    }
+
+    function toggleHabit(id) {
+      triggerHaptic('success');
+      const h = habits.find(x => x.id === id);
+      if (h) {
+        const nowStr = new Date().toISOString().split('T')[0];
+        if (h.lastDoneDate === nowStr) {
+          h.lastDoneDate = '';
+          h.streak = Math.max(0, h.streak - 1);
+        } else {
+          h.lastDoneDate = nowStr;
+          h.streak += 1;
+        }
+        saveState();
+        renderTracksTab();
+        renderDashboard();
+      }
+    }
+
+    function refreshCurrentView() {
+      if (currentTab === 'tasks') renderTasksTab();
+      else if (currentTab === 'matrix') renderMatrixTab();
+      else if (currentTab === 'goals') renderGoalsTab();
+      else if (currentTab === 'tracks') renderTracksTab();
+      renderDashboard();
+    }
+
+    // --- POMODORO TIMER ---
+    let pomoInterval = null;
+    let pomoSeconds = 25 * 60;
+    let pomoRunning = false;
+    let pomoCompletedSessions = 0;
+
+    function togglePomodoro() {
+      triggerHaptic('light');
+      const btn = document.getElementById('pomo-toggle-btn');
+      if (pomoRunning) {
+        clearInterval(pomoInterval);
+        pomoRunning = false;
+        btn.textContent = 'Продолжить';
+        btn.className = 'px-6 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm';
+      } else {
+        pomoRunning = true;
+        btn.textContent = 'Пауза';
+        btn.className = 'px-6 py-2.5 rounded-2xl bg-amber-500 text-white font-bold text-sm';
+        pomoInterval = setInterval(() => {
+          if (pomoSeconds > 0) {
+            pomoSeconds--;
+            updatePomoDisplay();
+          } else {
+            clearInterval(pomoInterval);
+            pomoRunning = false;
+            pomoCompletedSessions++;
+            document.getElementById('pomo-count').textContent = pomoCompletedSessions;
+            triggerHaptic('success');
+            alert('🎉 Фокус-сессия 25 мин завершена! Сделайте 5-минутный перерыв.');
+            resetPomodoro();
+          }
+        }, 1000);
+      }
+    }
+
+    function resetPomodoro() {
+      clearInterval(pomoInterval);
+      pomoRunning = false;
+      pomoSeconds = 25 * 60;
+      updatePomoDisplay();
+      const btn = document.getElementById('pomo-toggle-btn');
+      btn.textContent = 'Старт';
+      btn.className = 'px-6 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm';
+    }
+
+    function updatePomoDisplay() {
+      const mins = Math.floor(pomoSeconds / 60);
+      const secs = pomoSeconds % 60;
+      document.getElementById('pomo-timer-display').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    // --- MODALS ---
+    function openAddTaskModal(goalId = '') {
+      triggerHaptic('light');
+      document.getElementById('task-title-input').value = '';
+      document.getElementById('task-note-input').value = '';
+      document.getElementById('task-priority-input').value = 'p2';
+      document.getElementById('task-due-input').value = todayStr;
+      
+      // Populate goals select
+      const select = document.getElementById('task-goal-input');
+      select.innerHTML = '<option value="">Без цели</option>' + goals.map(g => `<option value="${g.id}" ${g.id === goalId ? 'selected' : ''}>${g.icon} ${escapeHtml(g.title)}</option>`).join('');
+
+      document.getElementById('modal-task').classList.remove('hidden');
+      setTimeout(() => document.getElementById('task-title-input').focus(), 100);
+    }
+
+    function closeTaskModal() {
+      document.getElementById('modal-task').classList.add('hidden');
+    }
+
+    function saveTaskFromModal() {
+      const title = document.getElementById('task-title-input').value.trim();
+      if (!title) return alert('Введите название задачи');
+
+      const newTask = {
+        id: 't_' + Date.now(),
+        title,
+        note: document.getElementById('task-note-input').value.trim(),
+        priority: document.getElementById('task-priority-input').value,
+        due: document.getElementById('task-due-input').value,
+        category: document.getElementById('task-category-input').value,
+        goalId: document.getElementById('task-goal-input').value,
+        completed: false
+      };
+
+      tasks.unshift(newTask);
+      saveState();
+      closeTaskModal();
+      triggerHaptic('success');
+      refreshCurrentView();
+    }
+
+    function openAddGoalModal() {
+      triggerHaptic('light');
+      document.getElementById('modal-goal').classList.remove('hidden');
+    }
+    function closeGoalModal() {
+      document.getElementById('modal-goal').classList.add('hidden');
+    }
+    function saveGoalFromModal() {
+      const title = document.getElementById('goal-title-input').value.trim();
+      if (!title) return alert('Введите название цели');
+      const newGoal = {
+        id: 'g_' + Date.now(),
+        title,
+        icon: document.getElementById('goal-icon-input').value.trim() || '🎯',
+        due: document.getElementById('goal-due-input').value,
+        completed: false
+      };
+      goals.unshift(newGoal);
+      saveState();
+      closeGoalModal();
+      triggerHaptic('success');
+      renderGoalsTab();
+      renderDashboard();
+    }
+
+    function openAddHabitModal() {
+      triggerHaptic('light');
+      document.getElementById('modal-habit').classList.remove('hidden');
+    }
+    function closeHabitModal() {
+      document.getElementById('modal-habit').classList.add('hidden');
+    }
+    function saveHabitFromModal() {
+      const title = document.getElementById('habit-title-input').value.trim();
+      if (!title) return alert('Введите название привычки');
+      const newHabit = {
+        id: 'h_' + Date.now(),
+        title,
+        icon: document.getElementById('habit-icon-input').value.trim() || '⚡',
+        streak: 0,
+        lastDoneDate: ''
+      };
+      habits.push(newHabit);
+      saveState();
+      closeHabitModal();
+      triggerHaptic('success');
+      renderTracksTab();
+      renderDashboard();
+    }
+
+    // --- UTILITIES ---
+    function formatDate(dStr) {
+      if (!dStr) return '';
+      const parts = dStr.split('-');
+      if (parts.length === 3) return `${parts[2]}.${parts[1]}`;
+      return dStr;
+    }
+
+    function getNoun(number, one, two, five) {
+      let n = Math.abs(number);
+      n %= 100;
+      if (n >= 5 && n <= 20) return five;
+      n %= 10;
+      if (n === 1) return one;
+      if (n >= 2 && n <= 4) return two;
+      return five;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Initial render
+    renderDashboard();
+  </script>
+</body>
+</html>
