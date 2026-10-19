@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Focus OS - Личный Центр Управления</title>
+  <title>Focus OS - Личный AI Центр, Универ & Хотелки</title>
   <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- Tailwind CSS -->
@@ -14,22 +14,17 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              50: '#f0fdf4',
-              500: '#10b981',
-              600: '#059669',
-            },
-            fire: {
-              400: '#fb7185',
-              500: '#f43f5e',
-              600: '#e11d48',
-            },
+            brand: { 500: '#10b981', 600: '#059669' },
+            fire: { 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48' },
+            ai: { 400: '#c084fc', 500: '#a855f7', 600: '#9333ea' },
+            study: { 400: '#38bdf8', 500: '#0284c7', 600: '#0369a1' },
+            wish: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' },
             dark: {
               bg: '#090d16',
               card: '#121826',
               cardHover: '#182032',
               border: '#1f293d',
-              glass: 'rgba(18, 24, 38, 0.75)'
+              glass: 'rgba(18, 24, 38, 0.85)'
             }
           }
         }
@@ -43,39 +38,28 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
-    input, textarea, select {
-      user-select: text;
-    }
-    /* Hide scrollbars for slick mobile view */
-    ::-webkit-scrollbar {
-      display: none;
-    }
+    input, textarea, select { user-select: text; }
+    ::-webkit-scrollbar { display: none; }
     body {
       background-color: #090d16;
       color: #f1f5f9;
       overscroll-behavior-y: none;
     }
     .glass-card {
-      background: rgba(18, 24, 38, 0.75);
+      background: rgba(18, 24, 38, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .glass-nav {
-      background: rgba(9, 13, 22, 0.92);
+      background: rgba(9, 13, 22, 0.96);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .neon-glow-fire {
-      box-shadow: 0 0 25px -5px rgba(244, 63, 94, 0.35);
-    }
-    .neon-glow-cyan {
-      box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.3);
-    }
-    .neon-glow-emerald {
-      box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.35);
-    }
+    .neon-glow-ai { box-shadow: 0 0 30px -5px rgba(168, 85, 247, 0.35); }
+    .neon-glow-cyan { box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.3); }
+    .neon-glow-wish { box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.3); }
     .progress-ring-circle {
       transition: stroke-dashoffset 0.8s ease-in-out;
       transform: rotate(-90deg);
@@ -86,11 +70,11 @@
 <body class="bg-dark-bg text-slate-100 min-h-screen pb-28 pt-2">
 
   <!-- TOP HEADER -->
-  <header class="px-5 pt-3 pb-3 flex items-center justify-between sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-md">
+  <header class="px-5 pt-3 pb-3 flex items-center justify-between sticky top-0 z-40 bg-dark-bg/85 backdrop-blur-md">
     <div class="flex items-center space-x-3">
       <div class="relative">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-fuchsia-500 p-[2px] shadow-lg">
-          <div class="w-full h-full bg-dark-card rounded-[14px] flex items-center justify-center font-extrabold text-sm text-cyan-400">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-purple-500 to-sky-500 p-[2px] shadow-lg">
+          <div class="w-full h-full bg-dark-card rounded-[14px] flex items-center justify-center font-extrabold text-sm text-amber-400">
             ⚡
           </div>
         </div>
@@ -100,31 +84,68 @@
         </span>
       </div>
       <div>
-        <h1 class="text-xs uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1.5">
-          <span>Personal OS</span>
-          <span class="px-1.5 py-0.5 rounded-full text-[9px] bg-cyan-950/80 text-cyan-400 border border-cyan-800/40">PRO</span>
-        </h1>
+        <div class="flex items-center gap-1.5">
+          <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Focus OS</span>
+          <span id="cloud-sync-status" class="px-1.5 py-0.5 rounded-full text-[9px] bg-emerald-950/80 text-emerald-400 border border-emerald-800/40 font-semibold flex items-center gap-0.5">
+            <span>☁️</span> Облако
+          </span>
+        </div>
         <p id="user-greeting" class="text-base font-bold text-white tracking-tight">Привет, Чемпион!</p>
       </div>
     </div>
 
-    <!-- Quick Action / Add Task button -->
-    <button onclick="openAddTaskModal()" class="w-9 h-9 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/25 active:scale-95 transition-transform">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-    </button>
+    <!-- Quick Actions -->
+    <div class="flex items-center space-x-2">
+      <button onclick="openAICoachModal()" title="AI Советник" class="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-purple-300 shadow-md shadow-purple-500/20 active:scale-95 transition-transform">
+        <span class="text-sm">✨</span>
+      </button>
+      <button onclick="openAddTaskModal()" title="Новая задача" class="w-9 h-9 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/25 active:scale-95 transition-transform">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+      </button>
+    </div>
   </header>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed top-16 left-4 right-4 z-50 pointer-events-none flex flex-col items-center space-y-2"></div>
 
   <!-- MAIN APP CONTAINER -->
   <main class="px-4 max-w-lg mx-auto space-y-5">
 
+    <!-- ============================================== -->
     <!-- TAB 1: DASHBOARD (ОБЗОР) -->
+    <!-- ============================================== -->
     <section id="tab-dashboard" class="space-y-5">
+
+      <!-- AI COACH BANNER -->
+      <div class="glass-card rounded-3xl p-4 relative overflow-hidden neon-glow-ai border border-purple-500/30 bg-gradient-to-br from-purple-900/25 via-dark-card to-dark-card">
+        <div class="flex items-start space-x-3">
+          <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-lg flex-shrink-0 shadow-lg shadow-purple-500/30">
+            🤖
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-purple-300 tracking-wide uppercase">AI Коуч • Анализ дня</span>
+              <span id="ai-status-tag" class="text-[10px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded-full">
+                В ресурсе
+              </span>
+            </div>
+            <p id="ai-insight-text" class="text-xs text-slate-200 mt-1 leading-relaxed">
+              Анализирую задачи, универ и цели...
+            </p>
+            <div class="mt-2 flex items-center space-x-2">
+              <button onclick="refreshAICoach(true)" class="px-2.5 py-0.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-[10px] font-bold text-purple-200 active:scale-95 transition-all">
+                ⚡ Новый совет
+              </button>
+              <button onclick="openAICoachModal()" class="px-2.5 py-0.5 rounded-lg bg-dark-bg/60 border border-slate-700 text-[10px] font-semibold text-slate-300 active:scale-95 transition-all">
+                Спросить →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- HERO STATS CARD -->
       <div class="glass-card rounded-3xl p-5 relative overflow-hidden neon-glow-cyan">
-        <div class="absolute -right-8 -top-8 w-36 h-36 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
-        <div class="absolute -left-8 -bottom-8 w-36 h-36 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
-
         <div class="flex items-center justify-between">
           <div>
             <span class="text-xs text-slate-400 font-medium">Прогресс сегодня</span>
@@ -134,7 +155,6 @@
             </div>
           </div>
           
-          <!-- Circular Progress Ring -->
           <div class="relative w-16 h-16 flex items-center justify-center">
             <svg class="w-16 h-16 transform -rotate-90">
               <circle cx="32" cy="32" r="26" stroke="#1e293b" stroke-width="5" fill="transparent"/>
@@ -151,10 +171,9 @@
           </div>
         </div>
 
-        <!-- 3 KPI METRICS TILES -->
         <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-800/80">
           <div class="bg-dark-card/60 rounded-2xl p-2.5 text-center border border-slate-800">
-            <div class="text-[10px] text-slate-400 font-medium">Висит всего</div>
+            <div class="text-[10px] text-slate-400 font-medium">Висит дел</div>
             <div id="stat-pending-count" class="text-lg font-extrabold text-white mt-0.5">0</div>
           </div>
           <div class="bg-dark-card/60 rounded-2xl p-2.5 text-center border border-fire-500/20 bg-fire-500/5">
@@ -163,14 +182,44 @@
             </div>
             <div id="stat-burning-count" class="text-lg font-extrabold text-rose-400 mt-0.5">0</div>
           </div>
-          <div class="bg-dark-card/60 rounded-2xl p-2.5 text-center border border-slate-800">
-            <div class="text-[10px] text-emerald-400 font-medium">Закрыто</div>
+          <div onclick="openHistoryModal()" class="bg-dark-card/60 rounded-2xl p-2.5 text-center border border-emerald-500/20 bg-emerald-500/5 cursor-pointer active:scale-95 transition-all">
+            <div class="text-[10px] text-emerald-400 font-semibold flex items-center justify-center gap-1">
+              <span>📂</span> Архив
+            </div>
             <div id="stat-done-count" class="text-lg font-extrabold text-emerald-400 mt-0.5">0</div>
           </div>
         </div>
       </div>
 
-      <!-- SECTION: "ЧТО ГОРИТ 🔥" (BURNING & URGENT) -->
+      <!-- UNIVERSITY SNIPPET -->
+      <div class="glass-card rounded-3xl p-4 space-y-2.5 border border-sky-500/20 bg-sky-500/5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-base">🎓</span>
+            <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wide">Университет сегодня</h3>
+          </div>
+          <button onclick="switchTab('study')" class="text-xs text-sky-300 font-bold hover:underline">
+            Расписание & ДЗ →
+          </button>
+        </div>
+        <div id="dashboard-study-snippet" class="text-xs text-slate-300 space-y-1.5"></div>
+      </div>
+
+      <!-- WISHLIST SNIPPET (NEW!) -->
+      <div class="glass-card rounded-3xl p-4 space-y-2.5 border border-amber-500/20 bg-amber-500/5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-base">🎁</span>
+            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wide">Главная цель в покупках</h3>
+          </div>
+          <button onclick="switchTab('wishlist')" class="text-xs text-amber-300 font-bold hover:underline">
+            Все хотелки →
+          </button>
+        </div>
+        <div id="dashboard-wishlist-snippet" class="text-xs text-slate-300"></div>
+      </div>
+
+      <!-- SECTION: "ЧТО ГОРИТ 🔥" -->
       <div id="burning-section" class="space-y-2.5">
         <div class="flex items-center justify-between px-1">
           <div class="flex items-center space-x-2">
@@ -187,10 +236,7 @@
             0 задач
           </span>
         </div>
-
-        <div id="burning-tasks-list" class="space-y-2.5">
-          <!-- Dynamic cards injected via JS -->
-        </div>
+        <div id="burning-tasks-list" class="space-y-2.5"></div>
       </div>
 
       <!-- SECTION: "СЕГОДНЯ В ПЛАНАХ 🎯" -->
@@ -203,158 +249,135 @@
             Все задачи →
           </button>
         </div>
-
-        <div id="today-tasks-list" class="space-y-2.5">
-          <!-- Dynamic cards injected via JS -->
-        </div>
+        <div id="today-tasks-list" class="space-y-2.5"></div>
       </div>
 
-      <!-- SECTION: ПРОГРЕСС ЦЕЛЕЙ (GOALS PREVIEW) -->
-      <div class="glass-card rounded-3xl p-4 space-y-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <span class="text-sm">🏆</span>
-            <h3 class="text-sm font-bold text-white">Стратегические цели</h3>
+      <!-- HISTORY FOLDER SHORTCUT -->
+      <div onclick="openHistoryModal()" class="glass-card rounded-2xl p-3.5 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-emerald-500/40 active:scale-95 transition-all">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold">
+            📂
           </div>
-          <button onclick="switchTab('goals')" class="text-xs text-cyan-400 font-semibold hover:underline">
-            Подробнее →
-          </button>
-        </div>
-        <div id="dashboard-goals-list" class="space-y-2.5">
-          <!-- Goals injected via JS -->
-        </div>
-      </div>
-
-      <!-- SECTION: ТРЕК ПРИВЫЧЕК (QUICK STREAKS) -->
-      <div class="glass-card rounded-3xl p-4 space-y-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <span class="text-sm">⚡</span>
-            <h3 class="text-sm font-bold text-white">Ежедневный фокус и треки</h3>
+          <div>
+            <div class="text-xs font-bold text-white">Папка: История выполненных задач</div>
+            <div id="history-shortcut-count" class="text-[10px] text-slate-400">0 задач сохранено в истории</div>
           </div>
-          <button onclick="switchTab('tracks')" class="text-xs text-cyan-400 font-semibold hover:underline">
-            Трекер →
-          </button>
         </div>
-        <div id="dashboard-habits-list" class="grid grid-cols-2 gap-2">
-          <!-- Habits mini cards -->
-        </div>
+        <span class="text-xs text-emerald-400 font-bold">Открыть →</span>
       </div>
 
     </section>
 
-    <!-- TAB 2: TASKS (ВСЕ ЗАДАЧИ С ФИЛЬТРАМИ) -->
+    <!-- ============================================== -->
+    <!-- TAB 2: TASKS (АКТИВНЫЕ ЗАДАЧИ) -->
+    <!-- ============================================== -->
     <section id="tab-tasks" class="space-y-4 hidden">
-      <!-- Search & Filters -->
       <div class="space-y-3">
-        <!-- Search bar -->
         <div class="relative">
           <svg class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          <input type="text" id="task-search-input" oninput="renderTasksTab()" placeholder="Поиск задач или заметок..." 
+          <input type="text" id="task-search-input" oninput="renderTasksTab()" placeholder="Поиск активных задач..." 
             class="w-full bg-dark-card border border-dark-border rounded-2xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors">
         </div>
 
-        <!-- Filter Pills Horizontal Scroll -->
         <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs font-semibold">
-          <button onclick="setTaskFilter('all')" id="filter-pill-all" class="px-3.5 py-1.5 rounded-xl bg-cyan-500 text-white shadow-sm flex-shrink-0 transition-all">Все</button>
+          <button onclick="setTaskFilter('all')" id="filter-pill-all" class="px-3.5 py-1.5 rounded-xl bg-cyan-500 text-white shadow-sm flex-shrink-0 transition-all font-bold">Активные</button>
           <button onclick="setTaskFilter('burning')" id="filter-pill-burning" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-rose-400 flex items-center gap-1 flex-shrink-0 transition-all">🔥 Горит</button>
           <button onclick="setTaskFilter('today')" id="filter-pill-today" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all">Сегодня</button>
           <button onclick="setTaskFilter('week')" id="filter-pill-week" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all">На неделю</button>
-          <button onclick="setTaskFilter('completed')" id="filter-pill-completed" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-400 flex-shrink-0 transition-all">Выполнено</button>
+          <button onclick="openHistoryModal()" class="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 flex items-center gap-1 flex-shrink-0 transition-all">📂 Папка истории</button>
         </div>
       </div>
 
-      <!-- Tasks List -->
-      <div id="full-tasks-list" class="space-y-2.5">
-        <!-- Rendered by JS -->
-      </div>
+      <div id="full-tasks-list" class="space-y-2.5"></div>
     </section>
 
-    <!-- TAB 3: MATRIX (МАТРИЦА ЭЙЗЕНХАУЭРА) -->
-    <section id="tab-matrix" class="space-y-4 hidden">
-      <div class="glass-card rounded-2xl p-4 border border-slate-800">
-        <h2 class="text-base font-bold text-white flex items-center gap-2">
-          <span>🎯</span> Матрица Эйзенхауэра
-        </h2>
-        <p class="text-xs text-slate-400 mt-1">Разделение задач по важности и срочности для максимальной продуктивности.</p>
-      </div>
-
-      <div class="grid grid-cols-1 gap-3">
-        <!-- Q1: Срочно и Важно (Сделать сейчас!) -->
-        <div class="glass-card rounded-3xl p-4 border border-rose-500/30 bg-rose-500/5 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-rose-400 uppercase tracking-wide flex items-center gap-1.5">
-              <span>🔥</span> 1. Срочно & Важно
-            </span>
-            <span id="matrix-count-q1" class="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold">0</span>
-          </div>
-          <div id="matrix-list-q1" class="space-y-2"></div>
-        </div>
-
-        <!-- Q2: Не срочно, но Важно (Стратегия и Рост) -->
-        <div class="glass-card rounded-3xl p-4 border border-indigo-500/30 bg-indigo-500/5 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wide flex items-center gap-1.5">
-              <span>💎</span> 2. Не срочно & Важно
-            </span>
-            <span id="matrix-count-q2" class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold">0</span>
-          </div>
-          <div id="matrix-list-q2" class="space-y-2"></div>
-        </div>
-
-        <!-- Q3: Срочно, но Не важно (Делегировать) -->
-        <div class="glass-card rounded-3xl p-4 border border-amber-500/30 bg-amber-500/5 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-amber-400 uppercase tracking-wide flex items-center gap-1.5">
-              <span>⚡</span> 3. Срочно & Не важно
-            </span>
-            <span id="matrix-count-q3" class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold">0</span>
-          </div>
-          <div id="matrix-list-q3" class="space-y-2"></div>
-        </div>
-
-        <!-- Q4: Не срочно и Не важно (Минимизировать) -->
-        <div class="glass-card rounded-3xl p-4 border border-slate-700/50 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
-              <span>☕</span> 4. Не срочно & Не важно
-            </span>
-            <span id="matrix-count-q4" class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-bold">0</span>
-          </div>
-          <div id="matrix-list-q4" class="space-y-2"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: GOALS (ЦЕЛИ И ПЛАНЫ) -->
-    <section id="tab-goals" class="space-y-4 hidden">
-      <div class="flex items-center justify-between px-1">
-        <div>
-          <h2 class="text-base font-bold text-white flex items-center gap-2">
-            <span>🏆</span> Мои Главные Цели
-          </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Долгосрочные цели и автоматический расчет прогресса</p>
-        </div>
-        <button onclick="openAddGoalModal()" class="px-3 py-1.5 rounded-xl bg-cyan-500 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-cyan-500/20 active:scale-95 transition-transform">
-          <span>+ Цель</span>
+    <!-- ============================================== -->
+    <!-- TAB 3: STUDY (УНИВЕР: РАСПИСАНИЕ & ДОМАШКИ) -->
+    <!-- ============================================== -->
+    <section id="tab-study" class="space-y-4 hidden">
+      <div class="glass-card rounded-2xl p-1.5 flex items-center space-x-1 border border-slate-800">
+        <button onclick="setStudyView('schedule')" id="study-btn-schedule" class="flex-1 py-2 rounded-xl text-xs font-bold bg-sky-500 text-white transition-all shadow-md shadow-sky-500/20">
+          📅 Расписание пар
+        </button>
+        <button onclick="setStudyView('homework')" id="study-btn-homework" class="flex-1 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all">
+          📚 Домашки (ДЗ)
         </button>
       </div>
 
-      <div id="goals-full-list" class="space-y-3.5">
-        <!-- Rendered by JS -->
+      <!-- Schedule -->
+      <div id="study-subview-schedule" class="space-y-4">
+        <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs font-bold">
+          <button onclick="selectScheduleDay('mon')" id="day-pill-mon" class="px-3 py-1.5 rounded-xl bg-sky-500 text-white">Пн</button>
+          <button onclick="selectScheduleDay('tue')" id="day-pill-tue" class="px-3 py-1.5 rounded-xl bg-dark-card border border-slate-800 text-slate-400">Вт</button>
+          <button onclick="selectScheduleDay('wed')" id="day-pill-wed" class="px-3 py-1.5 rounded-xl bg-dark-card border border-slate-800 text-slate-400">Ср</button>
+          <button onclick="selectScheduleDay('thu')" id="day-pill-thu" class="px-3 py-1.5 rounded-xl bg-dark-card border border-slate-800 text-slate-400">Чт</button>
+          <button onclick="selectScheduleDay('fri')" id="day-pill-fri" class="px-3 py-1.5 rounded-xl bg-dark-card border border-slate-800 text-slate-400">Пт</button>
+          <button onclick="selectScheduleDay('sat')" id="day-pill-sat" class="px-3 py-1.5 rounded-xl bg-dark-card border border-slate-800 text-slate-400">Сб</button>
+        </div>
+
+        <div class="flex items-center justify-between px-1">
+          <span id="current-day-label" class="text-xs font-bold text-slate-300 uppercase tracking-wider">Пары на Понедельник</span>
+          <button onclick="openAddLessonModal()" class="px-2.5 py-1 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-300 text-xs font-bold flex items-center gap-1 active:scale-95 transition-all">
+            + Добавить пару
+          </button>
+        </div>
+
+        <div id="lessons-list" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Homework -->
+      <div id="study-subview-homework" class="space-y-4 hidden">
+        <div class="flex items-center justify-between px-1">
+          <div>
+            <h3 class="text-sm font-bold text-white">Текущие задания и дедлайны</h3>
+            <p class="text-[10px] text-slate-400">Выполненные ДЗ автоматически переходят в архив</p>
+          </div>
+          <button onclick="openAddHomeworkModal()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white text-xs font-bold shadow-md shadow-sky-500/20 active:scale-95 transition-all">
+            + Задание
+          </button>
+        </div>
+
+        <div id="homework-list" class="space-y-2.5"></div>
       </div>
     </section>
 
-    <!-- TAB 5: TRACKS (ПРИВЫЧКИ И POMODORO ФОКУС) -->
-    <section id="tab-tracks" class="space-y-5 hidden">
-      
-      <!-- POMODORO TIMER CARD -->
+    <!-- ============================================== -->
+    <!-- TAB 4: WISHLIST (ХОТЕЛКИ & ПОКУПКИ) (NEW!) -->
+    <!-- ============================================== -->
+    <section id="tab-wishlist" class="space-y-4 hidden">
+      <div class="flex items-center justify-between px-1">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <span>🎁</span> Хотелки & Покупки
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Крупные мечты и желанные вещи с прогрессом накоплений</p>
+        </div>
+        <button onclick="openAddWishModal()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold shadow-md shadow-amber-500/25 active:scale-95 transition-all">
+          + Хотелка
+        </button>
+      </div>
+
+      <!-- Filter Pills for Wishlist -->
+      <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs font-semibold">
+        <button onclick="setWishlistFilter('all')" id="wish-filter-all" class="px-3 py-1.5 rounded-xl bg-amber-500 text-white font-bold transition-all">Все</button>
+        <button onclick="setWishlistFilter('big')" id="wish-filter-big" class="px-3 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 transition-all">💎 Крупные цели</button>
+        <button onclick="setWishlistFilter('regular')" id="wish-filter-regular" class="px-3 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 transition-all">🛍️ Покупки</button>
+        <button onclick="setWishlistFilter('bought')" id="wish-filter-bought" class="px-3 py-1.5 rounded-xl bg-dark-card border border-dark-border text-emerald-400 transition-all">🎉 Куплено</button>
+      </div>
+
+      <div id="wishlist-items-list" class="space-y-3.5"></div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 5: GROWTH (ЦЕЛИ & ТРЕКИ & POMODORO) -->
+    <!-- ============================================== -->
+    <section id="tab-growth" class="space-y-5 hidden">
+      <!-- Pomodoro Card -->
       <div class="glass-card rounded-3xl p-5 text-center relative overflow-hidden neon-glow-cyan">
         <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Фокус Сессия (Pomodoro)</span>
         <div class="my-4">
           <span id="pomo-timer-display" class="text-5xl font-black tracking-tight text-white font-mono">25:00</span>
         </div>
-        
         <div class="flex items-center justify-center space-x-3">
           <button id="pomo-toggle-btn" onclick="togglePomodoro()" class="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm shadow-lg shadow-cyan-500/30 active:scale-95 transition-transform">
             Старт
@@ -366,185 +389,363 @@
         <div class="mt-3 flex items-center justify-center space-x-4 text-xs text-slate-400">
           <span>Сессий сегодня: <b id="pomo-count" class="text-cyan-400">0</b></span>
           <span>•</span>
-          <span>Режим: <b>25 мин работы</b></span>
+          <span><b>25 мин работы</b></span>
         </div>
       </div>
 
-      <!-- HABITS TRACKER -->
+      <!-- Strategic Goals -->
       <div class="space-y-3">
         <div class="flex items-center justify-between px-1">
-          <div>
-            <h3 class="text-base font-bold text-white flex items-center gap-2">
-              <span>🔥</span> Трекер Привычек
-            </h3>
-            <p class="text-xs text-slate-400">Стрики непрерывного прогресса</p>
-          </div>
-          <button onclick="openAddHabitModal()" class="px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition-transform">
-            + Привычка
-          </button>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>🏆</span> Стратегические Цели
+          </h3>
+          <button onclick="openAddGoalModal()" class="text-xs text-cyan-400 font-semibold hover:underline">+ Цель</button>
         </div>
+        <div id="goals-full-list" class="space-y-3"></div>
+      </div>
 
-        <div id="habits-full-list" class="space-y-3">
-          <!-- Rendered by JS -->
+      <!-- Habits -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>🔥</span> Трекер Привычек (Стрики)
+          </h3>
+          <button onclick="openAddHabitModal()" class="text-xs text-emerald-400 font-semibold hover:underline">+ Привычка</button>
         </div>
+        <div id="habits-full-list" class="space-y-2.5"></div>
       </div>
     </section>
 
   </main>
 
-  <!-- BOTTOM NAVIGATION BAR (FIXED) -->
-  <nav class="fixed bottom-0 left-0 right-0 glass-nav z-50 px-3 py-2 max-w-lg mx-auto">
+  <!-- ============================================== -->
+  <!-- FIXED BOTTOM NAVIGATION BAR (5 TABS) -->
+  <!-- ============================================== -->
+  <nav class="fixed bottom-0 left-0 right-0 glass-nav z-50 px-2 py-2 max-w-lg mx-auto">
     <div class="grid grid-cols-5 gap-1 text-center">
       <!-- 1. Dashboard -->
-      <button onclick="switchTab('dashboard')" id="nav-btn-dashboard" class="flex flex-col items-center py-1.5 px-1 text-cyan-400 transition-colors">
+      <button onclick="switchTab('dashboard')" id="nav-btn-dashboard" class="flex flex-col items-center py-1.5 px-0.5 text-cyan-400 transition-colors">
         <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-        <span class="text-[10px] font-bold">Обзор</span>
+        <span class="text-[9px] font-bold">Обзор</span>
       </button>
 
       <!-- 2. Tasks -->
-      <button onclick="switchTab('tasks')" id="nav-btn-tasks" class="flex flex-col items-center py-1.5 px-1 text-slate-400 hover:text-slate-200 transition-colors">
+      <button onclick="switchTab('tasks')" id="nav-btn-tasks" class="flex flex-col items-center py-1.5 px-0.5 text-slate-400 hover:text-slate-200 transition-colors">
         <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-        <span class="text-[10px] font-bold">Задачи</span>
+        <span class="text-[9px] font-bold">Задачи</span>
       </button>
 
-      <!-- 3. Matrix -->
-      <button onclick="switchTab('matrix')" id="nav-btn-matrix" class="flex flex-col items-center py-1.5 px-1 text-slate-400 hover:text-slate-200 transition-colors">
-        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-        <span class="text-[10px] font-bold">Матрица</span>
+      <!-- 3. Study -->
+      <button onclick="switchTab('study')" id="nav-btn-study" class="flex flex-col items-center py-1.5 px-0.5 text-slate-400 hover:text-slate-200 transition-colors">
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+        <span class="text-[9px] font-bold">Универ</span>
       </button>
 
-      <!-- 4. Goals -->
-      <button onclick="switchTab('goals')" id="nav-btn-goals" class="flex flex-col items-center py-1.5 px-1 text-slate-400 hover:text-slate-200 transition-colors">
-        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
-        <span class="text-[10px] font-bold">Цели</span>
+      <!-- 4. Wishlist (NEW!) -->
+      <button onclick="switchTab('wishlist')" id="nav-btn-wishlist" class="flex flex-col items-center py-1.5 px-0.5 text-slate-400 hover:text-slate-200 transition-colors">
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V4a2 2 0 114 0v4h3a2 2 0 012 2v2a2 2 0 01-2 2h-1v7a2 2 0 01-2 2H8a2 2 0 01-2-2v-7H5a2 2 0 01-2-2v-2a2 2 0 012-2h3V4a2 2 0 114 0v4h0z"></path></svg>
+        <span class="text-[9px] font-bold">Хотелки</span>
       </button>
 
-      <!-- 5. Tracks -->
-      <button onclick="switchTab('tracks')" id="nav-btn-tracks" class="flex flex-col items-center py-1.5 px-1 text-slate-400 hover:text-slate-200 transition-colors">
+      <!-- 5. Growth -->
+      <button onclick="switchTab('growth')" id="nav-btn-growth" class="flex flex-col items-center py-1.5 px-0.5 text-slate-400 hover:text-slate-200 transition-colors">
         <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-        <span class="text-[10px] font-bold">Треки</span>
+        <span class="text-[9px] font-bold">Рост</span>
       </button>
     </div>
   </nav>
 
-  <!-- MODAL: ADD / EDIT TASK -->
-  <div id="modal-task" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
-    <div class="bg-dark-card border border-dark-border w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+  <!-- ============================================== -->
+  <!-- MODALS -->
+  <!-- ============================================== -->
+
+  <!-- MODAL: ADD / EDIT WISHLIST ITEM (NEW!) -->
+  <div id="modal-wish" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-dark-card border border-amber-500/30 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 id="modal-task-title" class="text-base font-bold text-white">Новая задача</h3>
-        <button onclick="closeTaskModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>🎁</span> Новая Хотелка / Покупка
+        </h3>
+        <button onclick="closeWishModal()" class="text-slate-400 hover:text-white p-1 text-lg">✕</button>
       </div>
 
       <div class="space-y-3">
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Название задачи *</label>
-          <input type="text" id="task-title-input" placeholder="Например: Запустить рекламу" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Заметка / Детали</label>
-          <textarea id="task-note-input" rows="2" placeholder="Дополнительные детали..." class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"></textarea>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Что хочу купить *</label>
+          <input type="text" id="wish-title-input" placeholder="Например: Кроссовки Nike Air Jordan или BMW 3" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2.5 text-sm text-white">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Срочность (Приоритет)</label>
-            <select id="task-priority-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Тип цели</label>
+            <select id="wish-type-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+              <option value="regular" selected>🛍️ Обычная покупка</option>
+              <option value="big">💎 Крупная цель / Мечта</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">К какому времени</label>
+            <input type="date" id="wish-due-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Стоимость (₽) *</label>
+            <input type="number" id="wish-cost-input" placeholder="15000" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Уже накоплено (₽)</label>
+            <input type="number" id="wish-saved-input" placeholder="0" value="0" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Ссылка на фото (URL картинки)</label>
+          <input type="text" id="wish-image-input" placeholder="https://... или оставьте пустым для иконки" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Описание / Зачем мне это</label>
+          <textarea id="wish-desc-input" rows="2" placeholder="Эмоции, модель, ссылки..." class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white"></textarea>
+        </div>
+      </div>
+
+      <button onclick="saveWishFromModal()" class="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-sm shadow-lg shadow-amber-500/25 active:scale-95 transition-transform">
+        Добавить в хотелки
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD MONEY TO WISH (КОПИЛКА) -->
+  <div id="modal-add-money" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-dark-card border border-amber-500/40 w-full max-w-sm rounded-3xl p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-bold text-white">Пополнить копилку</h3>
+        <button onclick="closeAddMoneyModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <p id="add-money-target-name" class="text-xs text-amber-300 font-semibold"></p>
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">Сумма пополнения (₽)</label>
+        <input type="number" id="add-money-input" placeholder="1000" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2.5 text-base text-white font-bold">
+      </div>
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="fillAddMoney(1000)" class="py-1.5 rounded-xl bg-dark-bg border border-slate-700 text-xs font-semibold text-slate-200">+1 000 ₽</button>
+        <button onclick="fillAddMoney(5000)" class="py-1.5 rounded-xl bg-dark-bg border border-slate-700 text-xs font-semibold text-slate-200">+5 000 ₽</button>
+        <button onclick="fillAddMoney(10000)" class="py-1.5 rounded-xl bg-dark-bg border border-slate-700 text-xs font-semibold text-slate-200">+10 000 ₽</button>
+      </div>
+      <button onclick="confirmAddMoney()" class="w-full py-2.5 rounded-xl bg-amber-500 text-white font-bold text-xs shadow-md shadow-amber-500/25">
+        Зачислить в цель
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: HISTORY FOLDER -->
+  <div id="modal-history" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-dark-card border border-emerald-500/30 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4 max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">📂</div>
+          <div>
+            <h3 class="text-base font-bold text-white">Папка: Выполненные задачи</h3>
+            <p id="history-modal-subtitle" class="text-[10px] text-emerald-400">0 решенных задач в архиве</p>
+          </div>
+        </div>
+        <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white p-1 text-lg">✕</button>
+      </div>
+      <div id="history-items-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1 min-h-[200px]"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD LESSON -->
+  <div id="modal-lesson" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-dark-card border border-sky-500/30 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white">Добавить пару</h3>
+        <button onclick="closeLessonModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">День недели</label>
+          <select id="lesson-day-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+            <option value="mon">Понедельник</option>
+            <option value="tue">Вторник</option>
+            <option value="wed">Среда</option>
+            <option value="thu">Четверг</option>
+            <option value="fri">Пятница</option>
+            <option value="sat">Суббота</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Время</label>
+            <input type="text" id="lesson-time-input" placeholder="09:00 - 10:30" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Тип занятия</label>
+            <select id="lesson-type-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+              <option value="Лекция">Лекция</option>
+              <option value="Практика" selected>Практика</option>
+              <option value="Лабораторная">Лабораторная</option>
+              <option value="Семинар">Семинар</option>
+              <option value="Экзамен">Экзамен</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Название предмета *</label>
+          <input type="text" id="lesson-subject-input" placeholder="Высшая математика" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Аудитория</label>
+            <input type="text" id="lesson-room-input" placeholder="ауд. 402" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Преподаватель</label>
+            <input type="text" id="lesson-teacher-input" placeholder="Иванов И.И." class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+          </div>
+        </div>
+      </div>
+      <button onclick="saveLessonFromModal()" class="w-full py-3 rounded-2xl bg-sky-500 text-white font-bold text-sm shadow-lg shadow-sky-500/25">
+        Сохранить пару
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD HOMEWORK -->
+  <div id="modal-homework" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-dark-card border border-sky-500/30 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white">Новое ДЗ</h3>
+        <button onclick="closeHomeworkModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Предмет *</label>
+            <input type="text" id="hw-subject-input" placeholder="Физика" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Дедлайн *</label>
+            <input type="date" id="hw-due-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Что нужно сделать *</label>
+          <input type="text" id="hw-title-input" placeholder="Решить задачи 14-22" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white">
+        </div>
+      </div>
+      <button onclick="saveHomeworkFromModal()" class="w-full py-3 rounded-2xl bg-sky-500 text-white font-bold text-sm shadow-lg shadow-sky-500/25">
+        Сохранить ДЗ
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD TASK -->
+  <div id="modal-task" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-dark-card border border-dark-border w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white">Новая задача</h3>
+        <button onclick="closeTaskModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-semibold text-slate-400">Название *</label>
+            <button type="button" onclick="aiAutoDecompose()" class="text-[10px] text-purple-400 hover:text-purple-300 font-bold">✨ Разбить через AI</button>
+          </div>
+          <input type="text" id="task-title-input" placeholder="Сдать отчет" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2.5 text-sm text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Заметка</label>
+          <textarea id="task-note-input" rows="2" placeholder="Детали..." class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Срочность</label>
+            <select id="task-priority-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
               <option value="p1">🔥 P1 — Горит / Срочно</option>
               <option value="p2" selected>⭐ P2 — Важно</option>
               <option value="p3">📅 P3 — Обычный</option>
               <option value="p4">☕ P4 — Низкий</option>
             </select>
           </div>
-
           <div>
             <label class="block text-xs font-semibold text-slate-400 mb-1">Дедлайн</label>
-            <input type="date" id="task-due-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+            <input type="date" id="task-due-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
           </div>
         </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Категория</label>
-            <select id="task-category-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-              <option value="Работа">💼 Работа</option>
-              <option value="Цели">🏆 Личные цели</option>
-              <option value="Здоровье">⚡ Здоровье и спорт</option>
-              <option value="Финансы">💰 Финансы</option>
-              <option value="Разное">📦 Разное</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Привязка к Цели</label>
-            <select id="task-goal-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-              <option value="">Без цели</option>
-            </select>
-          </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Категория</label>
+          <select id="task-category-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-sm text-white">
+            <option value="Универ">🎓 Универ / Учеба</option>
+            <option value="Работа">💼 Работа</option>
+            <option value="Хотелки">🎁 Хотелки & Покупки</option>
+            <option value="Цели">🏆 Цели</option>
+            <option value="Здоровье">⚡ Здоровье и спорт</option>
+            <option value="Разное">📦 Разное</option>
+          </select>
         </div>
       </div>
-
-      <div class="pt-2 flex items-center space-x-3">
-        <button onclick="saveTaskFromModal()" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm shadow-lg shadow-cyan-500/25 active:scale-95 transition-transform">
-          Сохранить задачу
-        </button>
-      </div>
+      <button onclick="saveTaskFromModal()" class="w-full py-3 rounded-2xl bg-cyan-500 text-white font-bold text-sm shadow-lg shadow-cyan-500/25">
+        Сохранить задачу
+      </button>
     </div>
   </div>
 
   <!-- MODAL: ADD GOAL -->
-  <div id="modal-goal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+  <div id="modal-goal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-dark-card border border-dark-border w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white">Новая Глобальная Цель</h3>
+        <h3 class="text-base font-bold text-white">Новая цель</h3>
         <button onclick="closeGoalModal()" class="text-slate-400 hover:text-white p-1">✕</button>
       </div>
       <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Название цели *</label>
-          <input type="text" id="goal-title-input" placeholder="Например: Запустить онлайн-школу" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Целевой дедлайн</label>
-          <input type="date" id="goal-due-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Иконка / Эмодзи</label>
-          <input type="text" id="goal-icon-input" value="🚀" class="w-20 bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-center text-lg text-white">
-        </div>
+        <input type="text" id="goal-title-input" placeholder="Название цели" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white">
+        <input type="date" id="goal-due-input" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white">
       </div>
-      <button onclick="saveGoalFromModal()" class="w-full py-3 rounded-2xl bg-cyan-500 text-white font-bold text-sm shadow-lg shadow-cyan-500/25 active:scale-95 transition-transform">
-        Создать цель
-      </button>
+      <button onclick="saveGoalFromModal()" class="w-full py-3 rounded-2xl bg-cyan-500 text-white font-bold text-sm">Создать цель</button>
     </div>
   </div>
 
   <!-- MODAL: ADD HABIT -->
-  <div id="modal-habit" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+  <div id="modal-habit" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-dark-card border border-dark-border w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white">Новая Привычка для Трекинга</h3>
+        <h3 class="text-base font-bold text-white">Новая привычка</h3>
         <button onclick="closeHabitModal()" class="text-slate-400 hover:text-white p-1">✕</button>
       </div>
       <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Название привычки *</label>
-          <input type="text" id="habit-title-input" placeholder="Например: Чтение 30 минут" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Иконка / Эмодзи</label>
-          <input type="text" id="habit-icon-input" value="📚" class="w-20 bg-dark-bg border border-dark-border rounded-xl px-3 py-2 text-center text-lg text-white">
-        </div>
+        <input type="text" id="habit-title-input" placeholder="Название привычки" class="w-full bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-sm text-white">
       </div>
-      <button onclick="saveHabitFromModal()" class="w-full py-3 rounded-2xl bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition-transform">
-        Начать трек
-      </button>
+      <button onclick="saveHabitFromModal()" class="w-full py-3 rounded-2xl bg-emerald-500 text-white font-bold text-sm">Начать трек</button>
     </div>
   </div>
 
+  <!-- MODAL: AI COACH -->
+  <div id="modal-ai-coach" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-dark-card border border-purple-500/30 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-4 max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2"><span>🤖</span> AI Продуктивный Коуч</h3>
+        <button onclick="closeAICoachModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+      <div id="ai-chat-output" class="flex-1 bg-dark-bg/80 border border-slate-800 rounded-2xl p-4 overflow-y-auto space-y-2.5 text-xs text-slate-200 min-h-[160px]">
+        <div id="ai-custom-response">
+          Я анализирую ваши задачи, дедлайны, пары в универе и прогресс по покупкам! Задайте любой вопрос.
+        </div>
+      </div>
+      <div class="flex items-center space-x-2 pt-1">
+        <input type="text" id="ai-user-query" placeholder="Спросить коуча..." class="flex-1 bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-xs text-white">
+        <button onclick="sendCustomAIQuery()" class="px-4 py-2 rounded-xl bg-purple-500 text-white font-bold text-xs">Отправить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
   <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <!-- ============================================== -->
   <script>
-    // --- TELEGRAM WEB APP INIT ---
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
@@ -556,7 +757,6 @@
       } catch (e) {}
     }
 
-    // Haptic feedback helper
     function triggerHaptic(type = 'light') {
       try {
         if (tg?.HapticFeedback) {
@@ -567,32 +767,107 @@
       } catch (e) {}
     }
 
-    // --- STATE INITIALIZATION WITH SAMPLE DATA ---
-    const STORAGE_KEY_TASKS = 'focus_os_tasks_v1';
-    const STORAGE_KEY_GOALS = 'focus_os_goals_v1';
-    const STORAGE_KEY_HABITS = 'focus_os_habits_v1';
+    function showNotification(text) {
+      const c = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'glass-card border border-emerald-500/50 text-white text-xs font-semibold px-4 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 transition-all duration-300';
+      toast.innerHTML = text;
+      c.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // --- KEYS & DEFAULTS ---
+    const CLOUD_KEYS = {
+      TASKS: 'tma_tasks_v3',
+      GOALS: 'tma_goals_v3',
+      HABITS: 'tma_habits_v3',
+      SCHEDULE: 'tma_schedule_v3',
+      HOMEWORK: 'tma_homework_v3',
+      WISHLIST: 'tma_wishlist_v3'
+    };
 
     const todayStr = new Date().toISOString().split('T')[0];
 
-    const DEFAULT_GOALS = [
-      { id: 'g1', title: 'Запустить личный проект', icon: '🚀', due: '2026-11-30', completed: false },
-      { id: 'g2', title: 'Физическая форма и спорт', icon: '⚡', due: '2026-12-31', completed: false }
+    const DEFAULT_SCHEDULE = {
+      mon: [
+        { id: 's1', time: '09:00 - 10:30', subject: 'Высшая математика', type: 'Лекция', room: 'ауд. 302', teacher: 'Иванов И.И.' },
+        { id: 's2', time: '10:45 - 12:15', subject: 'Программирование', type: 'Практика', room: 'комп. класс 4', teacher: 'Смирнов А.С.' }
+      ],
+      tue: [
+        { id: 's3', time: '12:30 - 14:00', subject: 'Иностранный язык', type: 'Семинар', room: 'ауд. 210', teacher: 'Браун Э.В.' }
+      ],
+      wed: [
+        { id: 's4', time: '09:00 - 10:30', subject: 'Физика', type: 'Лекция', room: 'ауд. 101', teacher: 'Ковалев П.Н.' },
+        { id: 's5', time: '10:45 - 12:15', subject: 'Физика', type: 'Лабораторная', room: 'лаб. 12', teacher: 'Ковалев П.Н.' }
+      ],
+      thu: [
+        { id: 's6', time: '10:45 - 12:15', subject: 'Базы данных', type: 'Лекция', room: 'ауд. 504', teacher: 'Васильев В.В.' }
+      ],
+      fri: [
+        { id: 's7', time: '09:00 - 10:30', subject: 'Программирование', type: 'Лабораторная', room: 'комп. класс 2', teacher: 'Смирнов А.С.' }
+      ],
+      sat: []
+    };
+
+    const DEFAULT_HOMEWORK = [
+      { id: 'hw1', subject: 'Высшая математика', title: 'Решить интегралы №12-25', due: getOffsetDate(2), completed: false },
+      { id: 'hw2', subject: 'Программирование', title: 'Лабораторная работа №2', due: getOffsetDate(4), completed: false }
     ];
 
-    const DEFAULT_HABITS = [
-      { id: 'h1', title: 'Фокус-работа 2ч', icon: '🧠', streak: 5, lastDoneDate: todayStr },
-      { id: 'h2', title: 'Тренировка / Зарядка', icon: '💪', streak: 3, lastDoneDate: '' },
-      { id: 'h3', title: 'Чтение книги 20 мин', icon: '📖', streak: 7, lastDoneDate: todayStr },
-      { id: 'h4', title: 'План на следующий день', icon: '📝', streak: 12, lastDoneDate: '' }
+    // Default wishlist with big & regular goals
+    const DEFAULT_WISHLIST = [
+      {
+        id: 'w1',
+        title: 'Ноутбук для учебы и работы',
+        type: 'big',
+        cost: 120000,
+        saved: 45000,
+        due: '2026-12-20',
+        imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80',
+        desc: 'Мощный рабочий инструмент для программирования и учебы',
+        bought: false
+      },
+      {
+        id: 'w2',
+        title: 'Беспроводные наушники ANC',
+        type: 'regular',
+        cost: 15000,
+        saved: 15000,
+        due: '2026-11-05',
+        imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
+        desc: 'Для фокус-сессий и поездок в универ',
+        bought: true,
+        boughtAt: '18.10.2026'
+      },
+      {
+        id: 'w3',
+        title: 'Кроссовки для бега и зала',
+        type: 'regular',
+        cost: 9500,
+        saved: 4000,
+        due: '2026-11-20',
+        imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop&q=80',
+        desc: 'Комфорт на тренировках',
+        bought: false
+      }
     ];
 
     const DEFAULT_TASKS = [
-      { id: 't1', title: 'Закрыть срочные согласования', note: 'Критично сделать до обеда', priority: 'p1', due: todayStr, category: 'Работа', goalId: 'g1', completed: false },
-      { id: 't2', title: 'Оплатить сервер и домены', note: 'Истекает сегодня', priority: 'p1', due: todayStr, category: 'Финансы', goalId: '', completed: false },
-      { id: 't3', title: 'Провести стратегический созвон', note: 'Обсудить спринт и метрики', priority: 'p2', due: todayStr, category: 'Работа', goalId: 'g1', completed: false },
-      { id: 't4', title: 'Тренировка в зале 1.5ч', note: 'Грудь и плечи', priority: 'p2', due: todayStr, category: 'Здоровье', goalId: 'g2', completed: true },
-      { id: 't5', title: 'Подготовить отчет за неделю', note: 'Собрать аналитику', priority: 'p3', due: getOffsetDate(3), category: 'Работа', goalId: '', completed: false },
-      { id: 't6', title: 'Разобрать почту и отписаться от спама', note: 'Рутина', priority: 'p4', due: getOffsetDate(5), category: 'Разное', goalId: '', completed: false }
+      { id: 't1', title: 'Подготовить доклад к семинару', note: 'Сделать 8 слайдов', priority: 'p1', due: todayStr, category: 'Универ', completed: false, completedAt: null },
+      { id: 't2', title: 'Оплатить проездной и связь', note: 'Критично сегодня', priority: 'p1', due: todayStr, category: 'Финансы', completed: false, completedAt: null },
+      { id: 't3', title: 'Сдать реферат по истории', note: 'Отправить преподавателю', priority: 'p2', due: getOffsetDate(1), category: 'Универ', completed: false, completedAt: null }
+    ];
+
+    const DEFAULT_GOALS = [
+      { id: 'g1', title: 'Закрыть сессию на отлично', icon: '🎓', due: '2026-12-30', completed: false }
+    ];
+
+    const DEFAULT_HABITS = [
+      { id: 'h1', title: 'Учеба / Конспекты 1ч', icon: '📚', streak: 4, lastDoneDate: todayStr },
+      { id: 'h2', title: 'Фокус-работа 2ч', icon: '🧠', streak: 6, lastDoneDate: todayStr }
     ];
 
     function getOffsetDate(days) {
@@ -601,33 +876,93 @@
       return d.toISOString().split('T')[0];
     }
 
-    let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || DEFAULT_TASKS;
-    let goals = JSON.parse(localStorage.getItem(STORAGE_KEY_GOALS)) || DEFAULT_GOALS;
-    let habits = JSON.parse(localStorage.getItem(STORAGE_KEY_HABITS)) || DEFAULT_HABITS;
+    // In-memory state
+    let tasks = JSON.parse(localStorage.getItem(CLOUD_KEYS.TASKS)) || DEFAULT_TASKS;
+    let goals = JSON.parse(localStorage.getItem(CLOUD_KEYS.GOALS)) || DEFAULT_GOALS;
+    let habits = JSON.parse(localStorage.getItem(CLOUD_KEYS.HABITS)) || DEFAULT_HABITS;
+    let schedule = JSON.parse(localStorage.getItem(CLOUD_KEYS.SCHEDULE)) || DEFAULT_SCHEDULE;
+    let homework = JSON.parse(localStorage.getItem(CLOUD_KEYS.HOMEWORK)) || DEFAULT_HOMEWORK;
+    let wishlist = JSON.parse(localStorage.getItem(CLOUD_KEYS.WISHLIST)) || DEFAULT_WISHLIST;
 
+    // SAVE STATE (Local + Telegram CloudStorage)
     function saveState() {
-      localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
-      localStorage.setItem(STORAGE_KEY_GOALS, JSON.stringify(goals));
-      localStorage.setItem(STORAGE_KEY_HABITS, JSON.stringify(habits));
+      localStorage.setItem(CLOUD_KEYS.TASKS, JSON.stringify(tasks));
+      localStorage.setItem(CLOUD_KEYS.GOALS, JSON.stringify(goals));
+      localStorage.setItem(CLOUD_KEYS.HABITS, JSON.stringify(habits));
+      localStorage.setItem(CLOUD_KEYS.SCHEDULE, JSON.stringify(schedule));
+      localStorage.setItem(CLOUD_KEYS.HOMEWORK, JSON.stringify(homework));
+      localStorage.setItem(CLOUD_KEYS.WISHLIST, JSON.stringify(wishlist));
+
+      if (tg?.CloudStorage) {
+        tg.CloudStorage.setItem(CLOUD_KEYS.TASKS, JSON.stringify(tasks));
+        tg.CloudStorage.setItem(CLOUD_KEYS.GOALS, JSON.stringify(goals));
+        tg.CloudStorage.setItem(CLOUD_KEYS.HABITS, JSON.stringify(habits));
+        tg.CloudStorage.setItem(CLOUD_KEYS.SCHEDULE, JSON.stringify(schedule));
+        tg.CloudStorage.setItem(CLOUD_KEYS.HOMEWORK, JSON.stringify(homework));
+        tg.CloudStorage.setItem(CLOUD_KEYS.WISHLIST, JSON.stringify(wishlist));
+      }
     }
 
-    // --- TAB SWITCHING ---
+    // SYNC FROM TELEGRAM CLOUD ON LOAD
+    function syncFromTelegramCloud() {
+      if (!tg?.CloudStorage) return;
+      const keys = Object.values(CLOUD_KEYS);
+      tg.CloudStorage.getItems(keys, (err, res) => {
+        if (!err && res) {
+          try {
+            if (res[CLOUD_KEYS.TASKS]) tasks = JSON.parse(res[CLOUD_KEYS.TASKS]);
+            if (res[CLOUD_KEYS.GOALS]) goals = JSON.parse(res[CLOUD_KEYS.GOALS]);
+            if (res[CLOUD_KEYS.HABITS]) habits = JSON.parse(res[CLOUD_KEYS.HABITS]);
+            if (res[CLOUD_KEYS.SCHEDULE]) schedule = JSON.parse(res[CLOUD_KEYS.SCHEDULE]);
+            if (res[CLOUD_KEYS.HOMEWORK]) homework = JSON.parse(res[CLOUD_KEYS.HOMEWORK]);
+            if (res[CLOUD_KEYS.WISHLIST]) wishlist = JSON.parse(res[CLOUD_KEYS.WISHLIST]);
+            refreshCurrentView();
+          } catch(e){}
+        }
+      });
+    }
+
+    // CHECK URL PARAMETER FOR TASK AUTO-IMPORT FROM BOT (Solves Problem #1)
+    function checkImportedTask() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const importData = urlParams.get('import_task');
+      if (importData) {
+        try {
+          const taskObj = JSON.parse(decodeURIComponent(importData));
+          if (taskObj && taskObj.title) {
+            if (!tasks.some(t => t.id === taskObj.id || (t.title === taskObj.title && t.due === taskObj.due))) {
+              tasks.unshift(taskObj);
+              saveState();
+              showNotification(`📥 Задача от бота <b>«${escapeHtml(taskObj.title)}»</b> успешно сохранена в Focus OS!`);
+              triggerHaptic('success');
+              try {
+                window.history.replaceState({}, document.title, window.location.pathname);
+              } catch(e){}
+            }
+          }
+        } catch (e) {
+          console.error("Import error", e);
+        }
+      }
+    }
+
+    // --- TAB SWITCHING (5 TABS) ---
     let currentTab = 'dashboard';
     let currentTaskFilter = 'all';
 
     function switchTab(tabName, taskFilter = null) {
       triggerHaptic('light');
       currentTab = tabName;
-      ['dashboard', 'tasks', 'matrix', 'goals', 'tracks'].forEach(t => {
+      ['dashboard', 'tasks', 'study', 'wishlist', 'growth'].forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         const btn = document.getElementById(`nav-btn-${t}`);
         if (t === tabName) {
           el.classList.remove('hidden');
-          btn.classList.add('text-cyan-400');
+          btn.classList.add('text-amber-400');
           btn.classList.remove('text-slate-400');
         } else {
           el.classList.add('hidden');
-          btn.classList.remove('text-cyan-400');
+          btn.classList.remove('text-amber-400');
           btn.classList.add('text-slate-400');
         }
       });
@@ -635,12 +970,12 @@
       if (tabName === 'tasks') {
         if (taskFilter) setTaskFilter(taskFilter);
         else renderTasksTab();
-      } else if (tabName === 'matrix') {
-        renderMatrixTab();
-      } else if (tabName === 'goals') {
-        renderGoalsTab();
-      } else if (tabName === 'tracks') {
-        renderTracksTab();
+      } else if (tabName === 'study') {
+        renderStudyTab();
+      } else if (tabName === 'wishlist') {
+        renderWishlistTab();
+      } else if (tabName === 'growth') {
+        renderGrowthTab();
       } else {
         renderDashboard();
       }
@@ -650,22 +985,19 @@
     // --- DASHBOARD RENDERING ---
     function renderDashboard() {
       const nowStr = new Date().toISOString().split('T')[0];
-      const todayTasks = tasks.filter(t => t.due === nowStr);
-      const todayDone = todayTasks.filter(t => t.completed).length;
-      const todayTotal = todayTasks.length;
+      const todayTasks = tasks.filter(t => t.due === nowStr && !t.completed);
+      const todayTotal = tasks.filter(t => t.due === nowStr).length;
+      const todayDone = tasks.filter(t => t.due === nowStr && t.completed).length;
       const todayPercent = todayTotal > 0 ? Math.round((todayDone / todayTotal) * 100) : 0;
 
-      // Stats
       document.getElementById('stat-percent-today').textContent = `${todayPercent}%`;
       document.getElementById('stat-completed-fraction').textContent = `${todayDone}/${todayTotal} выполнено`;
       document.getElementById('hero-circle-text').textContent = `${todayPercent}%`;
 
-      // Circular ring offset: radius=26 => 2*pi*r ≈ 163.36
       const circle = document.getElementById('hero-progress-circle');
       const offset = 163.36 - (163.36 * todayPercent) / 100;
       circle.style.strokeDashoffset = offset;
 
-      // KPIs
       const pendingTotal = tasks.filter(t => !t.completed).length;
       const doneTotal = tasks.filter(t => t.completed).length;
       const burningTasks = tasks.filter(t => !t.completed && (t.priority === 'p1' || (t.due && t.due <= nowStr)));
@@ -673,95 +1005,97 @@
       document.getElementById('stat-pending-count').textContent = pendingTotal;
       document.getElementById('stat-burning-count').textContent = burningTasks.length;
       document.getElementById('stat-done-count').textContent = doneTotal;
+      document.getElementById('history-shortcut-count').textContent = `${doneTotal} ${getNoun(doneTotal, 'задача', 'задачи', 'задач')} в архиве`;
 
       // Burning Section
       const burningContainer = document.getElementById('burning-tasks-list');
       const burningBadge = document.getElementById('burning-badge');
       burningBadge.textContent = `${burningTasks.length} ${getNoun(burningTasks.length, 'задача', 'задачи', 'задач')}`;
-
-      if (burningTasks.length === 0) {
-        burningContainer.innerHTML = `
-          <div class="glass-card rounded-2xl p-4 text-center text-xs text-slate-400 border border-slate-800">
-            ✨ Всё спокойно! Горящих задач нет, дедлайны под контролем.
-          </div>
-        `;
-      } else {
-        burningContainer.innerHTML = burningTasks.map(t => createTaskCardHTML(t, true)).join('');
-      }
+      burningContainer.innerHTML = burningTasks.length === 0 
+        ? `<div class="glass-card rounded-2xl p-4 text-center text-xs text-slate-400">✨ Горящих дедлайнов нет!</div>`
+        : burningTasks.map(t => createTaskCardHTML(t, true)).join('');
 
       // Today Section
       const todayContainer = document.getElementById('today-tasks-list');
-      if (todayTasks.length === 0) {
-        todayContainer.innerHTML = `
-          <div class="glass-card rounded-2xl p-4 text-center text-xs text-slate-400 border border-slate-800">
-            На сегодня задач нет. Нажмите <b>+</b> вверху, чтобы добавить!
-          </div>
-        `;
-      } else {
-        todayContainer.innerHTML = todayTasks.map(t => createTaskCardHTML(t)).join('');
-      }
+      todayContainer.innerHTML = todayTasks.length === 0
+        ? `<div class="glass-card rounded-2xl p-4 text-center text-xs text-slate-400">На сегодня активных дел нет!</div>`
+        : todayTasks.map(t => createTaskCardHTML(t)).join('');
 
-      // Goals in Dashboard
-      const goalsContainer = document.getElementById('dashboard-goals-list');
-      goalsContainer.innerHTML = goals.slice(0, 2).map(g => {
-        const goalTasks = tasks.filter(t => t.goalId === g.id);
-        const gDone = goalTasks.filter(t => t.completed).length;
-        const gTotal = goalTasks.length;
-        const gPct = gTotal > 0 ? Math.round((gDone / gTotal) * 100) : 0;
-        return `
-          <div class="bg-dark-bg/60 border border-dark-border rounded-2xl p-3">
-            <div class="flex items-center justify-between text-xs mb-1.5">
-              <span class="font-bold text-white flex items-center gap-1.5">
-                <span>${g.icon}</span> ${escapeHtml(g.title)}
-              </span>
-              <span class="text-cyan-400 font-bold">${gPct}%</span>
-            </div>
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-              <div class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full transition-all duration-500" style="width: ${gPct}%"></div>
-            </div>
-          </div>
-        `;
-      }).join('');
+      // Study snippet
+      renderStudySnippet();
 
-      // Habits in Dashboard
-      const habitsContainer = document.getElementById('dashboard-habits-list');
-      habitsContainer.innerHTML = habits.slice(0, 4).map(h => {
-        const isDoneToday = h.lastDoneDate === nowStr;
-        return `
-          <div onclick="toggleHabit('${h.id}')" class="bg-dark-bg/60 border ${isDoneToday ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-dark-border'} rounded-2xl p-2.5 flex items-center justify-between cursor-pointer active:scale-95 transition-all">
-            <div class="flex items-center space-x-2">
-              <span class="text-base">${h.icon}</span>
-              <div class="overflow-hidden">
-                <div class="text-xs font-bold text-white truncate">${escapeHtml(h.title)}</div>
-                <div class="text-[10px] text-amber-400 font-semibold flex items-center gap-0.5">
-                  <span>🔥</span> ${h.streak} дн.
-                </div>
-              </div>
-            </div>
-            <div class="w-6 h-6 rounded-lg ${isDoneToday ? 'bg-emerald-500 text-white' : 'border border-slate-700 text-transparent'} flex items-center justify-center text-xs">
-              ✓
-            </div>
-          </div>
-        `;
-      }).join('');
+      // Wishlist snippet
+      renderWishlistSnippet();
+
+      // AI Coach
+      generateAICoachInsight();
     }
 
-    // Task Card Component
+    function renderStudySnippet() {
+      const daysMap = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+      const currentDayKey = daysMap[new Date().getDay()];
+      const dayLessons = schedule[currentDayKey] || [];
+      const pendingHw = homework.filter(h => !h.completed);
+
+      const el = document.getElementById('dashboard-study-snippet');
+      if (dayLessons.length === 0 && pendingHw.length === 0) {
+        el.innerHTML = `<span>🌴 Сегодня пар нет, по домашкам всё сдано!</span>`;
+        return;
+      }
+      let html = '';
+      if (dayLessons.length > 0) {
+        const next = dayLessons[0];
+        html += `<div class="flex items-center justify-between"><span class="font-bold text-white">⏰ Ближайшая: ${next.time}</span> <span class="text-[10px] bg-sky-950 px-2 py-0.5 rounded text-sky-300 font-semibold">${next.room}</span></div>`;
+        html += `<div class="text-slate-300">${escapeHtml(next.subject)} (${next.type})</div>`;
+      }
+      if (pendingHw.length > 0) {
+        html += `<div class="pt-1 text-[11px] text-amber-300 font-semibold">📚 На сдачу: ${pendingHw.length} заданий</div>`;
+      }
+      el.innerHTML = html;
+    }
+
+    function renderWishlistSnippet() {
+      const el = document.getElementById('dashboard-wishlist-snippet');
+      const activeWishes = wishlist.filter(w => !w.bought);
+      if (activeWishes.length === 0) {
+        el.innerHTML = `<span>Все хотелки исполнены! Нажмите, чтобы добавить новую цель.</span>`;
+        return;
+      }
+      const topWish = activeWishes.find(w => w.type === 'big') || activeWishes[0];
+      const pct = Math.min(100, Math.round((topWish.saved / topWish.cost) * 100));
+
+      el.innerHTML = `
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-white">${escapeHtml(topWish.title)}</span>
+            <span class="font-extrabold text-amber-400 font-mono">${pct}%</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-400">
+            <span>Накоплено: <b class="text-slate-200">${topWish.saved.toLocaleString('ru-RU')} ₽</b></span>
+            <span>Цель: <b>${topWish.cost.toLocaleString('ru-RU')} ₽</b></span>
+          </div>
+        </div>
+      `;
+    }
+
+    // Task Card
     function createTaskCardHTML(t, isBurning = false) {
       const isOverdue = t.due && t.due < todayStr && !t.completed;
       const priorityBadge = getPriorityBadge(t.priority);
 
       return `
-        <div class="glass-card rounded-2xl p-3.5 border ${isBurning ? 'border-rose-500/30 bg-rose-500/5' : 'border-slate-800/80'} flex items-start justify-between space-x-3 transition-all duration-200">
-          <button onclick="toggleTask('${t.id}')" class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-xl border-2 ${t.completed ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/50' : 'border-slate-600 hover:border-cyan-400'} flex items-center justify-center transition-all">
-            ${t.completed ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+        <div class="glass-card rounded-2xl p-3.5 border ${isBurning ? 'border-rose-500/30 bg-rose-500/5' : 'border-slate-800/80'} flex items-start justify-between space-x-3 transition-all">
+          <button onclick="completeTaskAndArchive('${t.id}')" title="Выполнить и перенести в архив" class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-xl border-2 border-slate-600 hover:border-emerald-400 hover:bg-emerald-500/20 flex items-center justify-center transition-all">
           </button>
           
-          <div class="flex-1 min-w-0" onclick="toggleTask('${t.id}')">
+          <div class="flex-1 min-w-0" onclick="completeTaskAndArchive('${t.id}')">
             <div class="flex items-center space-x-2">
-              <span class="text-sm font-bold text-white ${t.completed ? 'line-through text-slate-500' : ''}">${escapeHtml(t.title)}</span>
+              <span class="text-sm font-bold text-white">${escapeHtml(t.title)}</span>
             </div>
-            ${t.note ? `<p class="text-xs text-slate-400 mt-0.5 line-clamp-1">${escapeHtml(t.note)}</p>` : ''}
+            ${t.note ? `<p class="text-xs text-slate-400 mt-0.5 whitespace-pre-line line-clamp-2">${escapeHtml(t.note)}</p>` : ''}
             
             <div class="flex flex-wrap items-center gap-1.5 mt-2">
               ${priorityBadge}
@@ -774,7 +1108,7 @@
             </div>
           </div>
 
-          <button onclick="deleteTask('${t.id}')" class="text-slate-600 hover:text-rose-400 p-1 flex-shrink-0 transition-colors">
+          <button onclick="deleteTaskPermanently('${t.id}')" class="text-slate-600 hover:text-rose-400 p-1 flex-shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
           </button>
         </div>
@@ -788,16 +1122,83 @@
       return '<span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-800 text-slate-400">P4 Низкий</span>';
     }
 
-    // --- TASKS TAB RENDERING ---
+    // Task completion moves to history
+    function completeTaskAndArchive(id) {
+      triggerHaptic('success');
+      const t = tasks.find(x => x.id === id);
+      if (t) {
+        t.completed = true;
+        const now = new Date();
+        t.completedAt = `${now.toLocaleDateString('ru-RU')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        saveState();
+        refreshCurrentView();
+        showNotification(`🎉 Задача <b>«${escapeHtml(t.title)}»</b> выполнена и перенесена в Папку Истории!`);
+      }
+    }
+
+    function restoreTaskFromHistory(id) {
+      triggerHaptic('light');
+      const t = tasks.find(x => x.id === id);
+      if (t) {
+        t.completed = false;
+        t.completedAt = null;
+        saveState();
+        renderHistoryModal();
+        refreshCurrentView();
+      }
+    }
+
+    function deleteTaskPermanently(id) {
+      triggerHaptic('heavy');
+      tasks = tasks.filter(t => t.id !== id);
+      saveState();
+      refreshCurrentView();
+    }
+
+    // --- HISTORY MODAL ---
+    function openHistoryModal() {
+      triggerHaptic('light');
+      renderHistoryModal();
+      document.getElementById('modal-history').classList.remove('hidden');
+    }
+    function closeHistoryModal() {
+      document.getElementById('modal-history').classList.add('hidden');
+    }
+
+    function renderHistoryModal() {
+      const historyList = document.getElementById('history-items-list');
+      const completedTasks = tasks.filter(t => t.completed);
+      document.getElementById('history-modal-subtitle').textContent = `${completedTasks.length} ${getNoun(completedTasks.length, 'решенная задача', 'решенные задачи', 'решенных задач')} в архиве`;
+
+      if (completedTasks.length === 0) {
+        historyList.innerHTML = `<div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-sm">Папка истории пуста.</div>`;
+        return;
+      }
+
+      historyList.innerHTML = completedTasks.slice().reverse().map(t => `
+        <div class="glass-card rounded-2xl p-3.5 border border-emerald-500/20 bg-emerald-500/5 flex items-center justify-between space-x-3">
+          <div class="w-6 h-6 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-xs flex-shrink-0">✓</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs font-bold text-white line-through opacity-85 truncate">${escapeHtml(t.title)}</div>
+            <div class="text-[10px] text-emerald-400 font-medium mt-0.5">📅 Выполнено: ${t.completedAt || 'Недавно'} • ${t.category || 'Разное'}</div>
+          </div>
+          <button onclick="restoreTaskFromHistory('${t.id}')" class="px-2.5 py-1 rounded-xl bg-dark-bg border border-slate-700 text-[10px] font-bold text-slate-300 hover:text-white flex-shrink-0 active:scale-95 transition-all">
+            ↩️ Вернуть
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // --- TASKS TAB ---
     function setTaskFilter(filter) {
       triggerHaptic('light');
       currentTaskFilter = filter;
-      ['all', 'burning', 'today', 'week', 'completed'].forEach(f => {
+      ['all', 'burning', 'today', 'week'].forEach(f => {
         const btn = document.getElementById(`filter-pill-${f}`);
-        if (f === filter) {
-          btn.className = 'px-3.5 py-1.5 rounded-xl bg-cyan-500 text-white shadow-sm flex-shrink-0 transition-all font-bold';
-        } else {
-          btn.className = 'px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all font-medium';
+        if (btn) {
+          btn.className = f === filter 
+            ? 'px-3.5 py-1.5 rounded-xl bg-cyan-500 text-white shadow-sm flex-shrink-0 transition-all font-bold'
+            : 'px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all font-medium';
         }
       });
       renderTasksTab();
@@ -809,146 +1210,413 @@
       const nowStr = new Date().toISOString().split('T')[0];
       const nextWeekStr = getOffsetDate(7);
 
-      let filtered = tasks.filter(t => {
-        if (search && !t.title.toLowerCase().includes(search) && !t.note?.toLowerCase().includes(search)) return false;
-        if (currentTaskFilter === 'burning') return !t.completed && (t.priority === 'p1' || (t.due && t.due <= nowStr));
-        if (currentTaskFilter === 'today') return t.due === nowStr;
-        if (currentTaskFilter === 'week') return t.due && t.due >= nowStr && t.due <= nextWeekStr;
-        if (currentTaskFilter === 'completed') return t.completed;
-        return true;
-      });
+      let filtered = tasks.filter(t => !t.completed);
+      if (search) filtered = filtered.filter(t => t.title.toLowerCase().includes(search) || t.note?.toLowerCase().includes(search));
+      if (currentTaskFilter === 'burning') filtered = filtered.filter(t => t.priority === 'p1' || (t.due && t.due <= nowStr));
+      else if (currentTaskFilter === 'today') filtered = filtered.filter(t => t.due === nowStr);
+      else if (currentTaskFilter === 'week') filtered = filtered.filter(t => t.due && t.due >= nowStr && t.due <= nextWeekStr);
 
       if (filtered.length === 0) {
-        listEl.innerHTML = `
-          <div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-sm border border-slate-800">
-            🔍 Задач по данному фильтру не найдено
-          </div>
-        `;
+        listEl.innerHTML = `<div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-sm">🔍 Активных задач нет</div>`;
         return;
       }
-
       listEl.innerHTML = filtered.map(t => createTaskCardHTML(t)).join('');
     }
 
-    // --- MATRIX TAB RENDERING ---
-    function renderMatrixTab() {
-      const q1 = tasks.filter(t => !t.completed && t.priority === 'p1');
-      const q2 = tasks.filter(t => !t.completed && t.priority === 'p2');
-      const q3 = tasks.filter(t => !t.completed && t.priority === 'p3');
-      const q4 = tasks.filter(t => !t.completed && t.priority === 'p4');
+    // --- TAB 3: STUDY (УНИВЕРСИТЕТ) ---
+    let currentStudyView = 'schedule';
+    let selectedScheduleDay = 'mon';
+    const dayLabelsRu = { mon: 'Понедельник', tue: 'Вторник', wed: 'Среда', thu: 'Четверг', fri: 'Пятница', sat: 'Суббота' };
 
-      document.getElementById('matrix-count-q1').textContent = q1.length;
-      document.getElementById('matrix-count-q2').textContent = q2.length;
-      document.getElementById('matrix-count-q3').textContent = q3.length;
-      document.getElementById('matrix-count-q4').textContent = q4.length;
+    function setStudyView(view) {
+      triggerHaptic('light');
+      currentStudyView = view;
+      const btnSched = document.getElementById('study-btn-schedule');
+      const btnHw = document.getElementById('study-btn-homework');
+      const subSched = document.getElementById('study-subview-schedule');
+      const subHw = document.getElementById('study-subview-homework');
 
-      document.getElementById('matrix-list-q1').innerHTML = q1.length ? q1.map(t => createTaskCardHTML(t)).join('') : '<p class="text-[11px] text-slate-500">Пусто</p>';
-      document.getElementById('matrix-list-q2').innerHTML = q2.length ? q2.map(t => createTaskCardHTML(t)).join('') : '<p class="text-[11px] text-slate-500">Пусто</p>';
-      document.getElementById('matrix-list-q3').innerHTML = q3.length ? q3.map(t => createTaskCardHTML(t)).join('') : '<p class="text-[11px] text-slate-500">Пусто</p>';
-      document.getElementById('matrix-list-q4').innerHTML = q4.length ? q4.map(t => createTaskCardHTML(t)).join('') : '<p class="text-[11px] text-slate-500">Пусто</p>';
+      if (view === 'schedule') {
+        btnSched.className = 'flex-1 py-2 rounded-xl text-xs font-bold bg-sky-500 text-white transition-all shadow-md shadow-sky-500/20';
+        btnHw.className = 'flex-1 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all';
+        subSched.classList.remove('hidden');
+        subHw.classList.add('hidden');
+        renderSchedule();
+      } else {
+        btnHw.className = 'flex-1 py-2 rounded-xl text-xs font-bold bg-sky-500 text-white transition-all shadow-md shadow-sky-500/20';
+        btnSched.className = 'flex-1 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all';
+        subHw.classList.remove('hidden');
+        subSched.classList.add('hidden');
+        renderHomework();
+      }
     }
 
-    // --- GOALS TAB RENDERING ---
-    function renderGoalsTab() {
-      const container = document.getElementById('goals-full-list');
-      if (goals.length === 0) {
-        container.innerHTML = `
-          <div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-sm">
-            У вас пока нет целей. Нажмите <b>+ Цель</b>, чтобы задать вектор!
+    function selectScheduleDay(dayKey) {
+      triggerHaptic('light');
+      selectedScheduleDay = dayKey;
+      ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'].forEach(d => {
+        const pill = document.getElementById(`day-pill-${d}`);
+        pill.className = d === dayKey 
+          ? 'px-3 py-1.5 rounded-xl bg-sky-500 text-white font-bold transition-all'
+          : 'px-3 py-1.5 rounded-xl bg-dark-card border border-slate-800 text-slate-400 transition-all';
+      });
+      document.getElementById('current-day-label').textContent = `Пары на ${dayLabelsRu[dayKey]}`;
+      renderSchedule();
+    }
+
+    function renderStudyTab() {
+      if (currentStudyView === 'schedule') renderSchedule();
+      else renderHomework();
+    }
+
+    function renderSchedule() {
+      const container = document.getElementById('lessons-list');
+      const lessons = schedule[selectedScheduleDay] || [];
+      if (lessons.length === 0) {
+        container.innerHTML = `<div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-xs">🌴 В этот день пар нет! Нажмите <b>+ Добавить пару</b>.</div>`;
+        return;
+      }
+      container.innerHTML = lessons.map(l => `
+        <div class="glass-card rounded-2xl p-4 border border-sky-500/20 bg-dark-card flex items-start justify-between space-x-3">
+          <div class="flex-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-extrabold text-sky-400 font-mono">⏰ ${escapeHtml(l.time)}</span>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-950 text-sky-300 border border-sky-800/40">${l.type}</span>
+            </div>
+            <h4 class="text-sm font-bold text-white mt-1">${escapeHtml(l.subject)}</h4>
+            <div class="flex items-center space-x-3 text-[11px] text-slate-400 mt-1">
+              <span>📍 ${escapeHtml(l.room || 'Аудитория не указана')}</span>
+              ${l.teacher ? `<span>👨‍🏫 ${escapeHtml(l.teacher)}</span>` : ''}
+            </div>
           </div>
-        `;
+          <button onclick="deleteLesson('${l.id}')" class="text-slate-600 hover:text-rose-400 p-1">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function deleteLesson(id) {
+      triggerHaptic('heavy');
+      schedule[selectedScheduleDay] = (schedule[selectedScheduleDay] || []).filter(l => l.id !== id);
+      saveState();
+      renderSchedule();
+      renderDashboard();
+    }
+
+    function renderHomework() {
+      const container = document.getElementById('homework-list');
+      const pendingHw = homework.filter(h => !h.completed);
+      if (pendingHw.length === 0) {
+        container.innerHTML = `<div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-xs">✨ Все задания закрыты!</div>`;
+        return;
+      }
+      container.innerHTML = pendingHw.map(h => `
+        <div class="glass-card rounded-2xl p-4 border border-sky-500/30 bg-sky-500/5 flex items-start justify-between space-x-3">
+          <button onclick="completeHomework('${h.id}')" class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-xl border-2 border-slate-600 hover:border-emerald-400 flex items-center justify-center"></button>
+          <div class="flex-1 min-w-0" onclick="completeHomework('${h.id}')">
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-950 text-sky-300 border border-sky-800/40">${escapeHtml(h.subject)}</span>
+              <span class="text-[10px] text-amber-300 font-semibold">📅 Сдать: ${formatDate(h.due)}</span>
+            </div>
+            <h4 class="text-sm font-bold text-white mt-1">${escapeHtml(h.title)}</h4>
+          </div>
+          <button onclick="deleteHomework('${h.id}')" class="text-slate-600 hover:text-rose-400 p-1">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function completeHomework(id) {
+      triggerHaptic('success');
+      const hw = homework.find(h => h.id === id);
+      if (hw) {
+        hw.completed = true;
+        saveState();
+        renderHomework();
+        renderDashboard();
+      }
+    }
+    function deleteHomework(id) {
+      triggerHaptic('heavy');
+      homework = homework.filter(h => h.id !== id);
+      saveState();
+      renderHomework();
+      renderDashboard();
+    }
+
+    function openAddLessonModal() {
+      triggerHaptic('light');
+      document.getElementById('lesson-day-input').value = selectedScheduleDay;
+      document.getElementById('modal-lesson').classList.remove('hidden');
+    }
+    function closeLessonModal() { document.getElementById('modal-lesson').classList.add('hidden'); }
+    function saveLessonFromModal() {
+      const day = document.getElementById('lesson-day-input').value;
+      const subject = document.getElementById('lesson-subject-input').value.trim();
+      if (!subject) return alert('Введите предмет');
+      const newLesson = {
+        id: 'les_' + Date.now(),
+        time: document.getElementById('lesson-time-input').value.trim() || '09:00 - 10:30',
+        type: document.getElementById('lesson-type-input').value,
+        subject,
+        room: document.getElementById('lesson-room-input').value.trim(),
+        teacher: document.getElementById('lesson-teacher-input').value.trim()
+      };
+      if (!schedule[day]) schedule[day] = [];
+      schedule[day].push(newLesson);
+      saveState();
+      closeLessonModal();
+      triggerHaptic('success');
+      selectScheduleDay(day);
+      renderDashboard();
+    }
+
+    function openAddHomeworkModal() {
+      triggerHaptic('light');
+      document.getElementById('hw-due-input').value = getOffsetDate(3);
+      document.getElementById('modal-homework').classList.remove('hidden');
+    }
+    function closeHomeworkModal() { document.getElementById('modal-homework').classList.add('hidden'); }
+    function saveHomeworkFromModal() {
+      const subject = document.getElementById('hw-subject-input').value.trim();
+      const title = document.getElementById('hw-title-input').value.trim();
+      if (!subject || !title) return alert('Заполните предмет и задание');
+      homework.unshift({
+        id: 'hw_' + Date.now(),
+        subject,
+        title,
+        due: document.getElementById('hw-due-input').value,
+        completed: false
+      });
+      saveState();
+      closeHomeworkModal();
+      triggerHaptic('success');
+      renderHomework();
+      renderDashboard();
+    }
+
+    // --- TAB 4: WISHLIST (ХОТЕЛКИ & ПОКУПКИ) (Solves Problem #3) ---
+    let currentWishlistFilter = 'all';
+    let activeAddingMoneyWishId = null;
+
+    function setWishlistFilter(filter) {
+      triggerHaptic('light');
+      currentWishlistFilter = filter;
+      ['all', 'big', 'regular', 'bought'].forEach(f => {
+        const btn = document.getElementById(`wish-filter-${f}`);
+        if (btn) {
+          btn.className = f === filter
+            ? 'px-3 py-1.5 rounded-xl bg-amber-500 text-white font-bold transition-all'
+            : 'px-3 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 transition-all';
+        }
+      });
+      renderWishlistTab();
+    }
+
+    function renderWishlistTab() {
+      const listEl = document.getElementById('wishlist-items-list');
+      let filtered = wishlist.slice();
+
+      if (currentWishlistFilter === 'bought') {
+        filtered = filtered.filter(w => w.bought);
+      } else if (currentWishlistFilter === 'big') {
+        filtered = filtered.filter(w => !w.bought && w.type === 'big');
+      } else if (currentWishlistFilter === 'regular') {
+        filtered = filtered.filter(w => !w.bought && w.type === 'regular');
+      } else {
+        filtered = filtered.filter(w => !w.bought);
+      }
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-sm">В этом списке пока пусто. Нажмите <b>+ Хотелка</b>, чтобы поставить цель!</div>`;
         return;
       }
 
-      container.innerHTML = goals.map(g => {
-        const goalTasks = tasks.filter(t => t.goalId === g.id);
-        const gDone = goalTasks.filter(t => t.completed).length;
-        const gTotal = goalTasks.length;
-        const gPct = gTotal > 0 ? Math.round((gDone / gTotal) * 100) : 0;
+      listEl.innerHTML = filtered.map(w => {
+        const pct = Math.min(100, Math.round((w.saved / w.cost) * 100));
+        const isCompleted = w.bought || w.saved >= w.cost;
+        const typeBadge = w.type === 'big'
+          ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-950 text-purple-300 border border-purple-800/40">💎 Крупная цель</span>'
+          : '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800/40">🛍️ Покупка</span>';
 
         return `
-          <div class="glass-card rounded-3xl p-5 border border-slate-800 space-y-3">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <span class="text-3xl">${g.icon}</span>
-                <div>
-                  <h3 class="text-base font-bold text-white">${escapeHtml(g.title)}</h3>
-                  <p class="text-xs text-slate-400">Дедлайн: ${g.due ? formatDate(g.due) : 'Не задан'}</p>
+          <div class="glass-card rounded-3xl p-4 border ${w.bought ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-amber-500/20'} space-y-3">
+            ${w.imageUrl ? `
+              <div class="w-full h-36 rounded-2xl overflow-hidden relative">
+                <img src="${escapeHtml(w.imageUrl)}" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
+                ${w.bought ? '<div class="absolute inset-0 bg-emerald-950/70 backdrop-blur-xs flex items-center justify-center font-extrabold text-white text-base">🎉 КУПЛЕНО! МЕЧТА ИСПОЛНЕНА</div>' : ''}
+              </div>
+            ` : ''}
+
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-1.5 mb-1">
+                  ${typeBadge}
+                  ${w.due ? `<span class="text-[10px] text-slate-400">📅 До: ${formatDate(w.due)}</span>` : ''}
                 </div>
+                <h3 class="text-base font-bold text-white">${escapeHtml(w.title)}</h3>
+                ${w.desc ? `<p class="text-xs text-slate-400 mt-0.5">${escapeHtml(w.desc)}</p>` : ''}
               </div>
-              <span class="text-lg font-black text-cyan-400">${gPct}%</span>
+              <button onclick="deleteWish('${w.id}')" class="text-slate-600 hover:text-rose-400 p-1">✕</button>
             </div>
 
-            <!-- Progress Bar -->
-            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-              <div class="bg-gradient-to-r from-cyan-500 via-indigo-500 to-fuchsia-500 h-full rounded-full transition-all duration-500" style="width: ${gPct}%"></div>
+            <!-- Progress & Numbers -->
+            <div class="space-y-1.5 pt-1">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-300">Накоплено: <b class="text-white">${w.saved.toLocaleString('ru-RU')} ₽</b></span>
+                <span class="font-extrabold ${pct >= 100 ? 'text-emerald-400' : 'text-amber-400'}">${pct}%</span>
+              </div>
+              <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-gradient-to-r ${w.bought ? 'from-emerald-500 to-teal-400' : 'from-amber-500 via-orange-500 to-amber-400'} h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-slate-400">
+                <span>Цель: <b class="text-slate-200">${w.cost.toLocaleString('ru-RU')} ₽</b></span>
+                <span>Осталось: <b class="text-amber-300">${Math.max(0, w.cost - w.saved).toLocaleString('ru-RU')} ₽</b></span>
+              </div>
             </div>
 
-            <!-- Subtasks preview -->
-            <div class="pt-2 border-t border-slate-800/80">
-              <div class="text-xs font-semibold text-slate-400 mb-2 flex items-center justify-between">
-                <span>Связанные задачи (${gDone}/${gTotal})</span>
-                <button onclick="openAddTaskModal('${g.id}')" class="text-cyan-400 hover:underline">+ Добавить задачу</button>
+            <!-- Action Buttons -->
+            ${!w.bought ? `
+              <div class="pt-2 flex items-center space-x-2">
+                <button onclick="openAddMoneyModal('${w.id}')" class="flex-1 py-2 rounded-xl bg-dark-bg border border-amber-500/40 text-amber-300 hover:bg-amber-500/10 text-xs font-bold active:scale-95 transition-all">
+                  💰 Пополнить копилку
+                </button>
+                <button onclick="markWishBought('${w.id}')" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition-all">
+                  ✓ Куплено!
+                </button>
               </div>
-              <div class="space-y-1.5">
-                ${goalTasks.slice(0, 3).map(t => `
-                  <div onclick="toggleTask('${t.id}')" class="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
-                    <span class="${t.completed ? 'text-emerald-400' : 'text-slate-600'}">●</span>
-                    <span class="${t.completed ? 'line-through text-slate-500' : ''}">${escapeHtml(t.title)}</span>
-                  </div>
-                `).join('')}
+            ` : `
+              <div class="pt-2 text-center text-xs font-bold text-emerald-400">
+                ✨ Покупка совершена! Дата: ${w.boughtAt || 'Недавно'}
               </div>
-            </div>
+            `}
           </div>
         `;
       }).join('');
     }
 
-    // --- TRACKS & HABITS RENDERING ---
-    function renderTracksTab() {
-      const container = document.getElementById('habits-full-list');
-      const nowStr = new Date().toISOString().split('T')[0];
+    function openAddWishModal() {
+      triggerHaptic('light');
+      document.getElementById('wish-title-input').value = '';
+      document.getElementById('wish-cost-input').value = '';
+      document.getElementById('wish-saved-input').value = '0';
+      document.getElementById('wish-image-input').value = '';
+      document.getElementById('wish-desc-input').value = '';
+      document.getElementById('wish-due-input').value = getOffsetDate(60);
+      document.getElementById('modal-wish').classList.remove('hidden');
+    }
+    function closeWishModal() { document.getElementById('modal-wish').classList.add('hidden'); }
 
-      container.innerHTML = habits.map(h => {
-        const isDoneToday = h.lastDoneDate === nowStr;
+    function saveWishFromModal() {
+      const title = document.getElementById('wish-title-input').value.trim();
+      const cost = parseFloat(document.getElementById('wish-cost-input').value);
+      const saved = parseFloat(document.getElementById('wish-saved-input').value) || 0;
+      if (!title || !cost) return alert('Заполните название и стоимость');
+
+      const newWish = {
+        id: 'w_' + Date.now(),
+        title,
+        type: document.getElementById('wish-type-input').value,
+        cost,
+        saved,
+        due: document.getElementById('wish-due-input').value,
+        imageUrl: document.getElementById('wish-image-input').value.trim(),
+        desc: document.getElementById('wish-desc-input').value.trim(),
+        bought: false
+      };
+
+      wishlist.unshift(newWish);
+      saveState();
+      closeWishModal();
+      triggerHaptic('success');
+      renderWishlistTab();
+      renderDashboard();
+      showNotification(`🎁 Хотелка <b>«${escapeHtml(title)}»</b> сохранена в ваши цели!`);
+    }
+
+    function openAddMoneyModal(id) {
+      triggerHaptic('light');
+      activeAddingMoneyWishId = id;
+      const w = wishlist.find(x => x.id === id);
+      document.getElementById('add-money-target-name').textContent = w ? w.title : '';
+      document.getElementById('add-money-input').value = '';
+      document.getElementById('modal-add-money').classList.remove('hidden');
+    }
+    function closeAddMoneyModal() { document.getElementById('modal-add-money').classList.add('hidden'); }
+    function fillAddMoney(amount) { document.getElementById('add-money-input').value = amount; }
+
+    function confirmAddMoney() {
+      const val = parseFloat(document.getElementById('add-money-input').value);
+      if (!val || val <= 0) return alert('Введите корректную сумму');
+      const w = wishlist.find(x => x.id === activeAddingMoneyWishId);
+      if (w) {
+        w.saved += val;
+        saveState();
+        closeAddMoneyModal();
+        triggerHaptic('success');
+        renderWishlistTab();
+        renderDashboard();
+        showNotification(`💰 В копилку <b>«${escapeHtml(w.title)}»</b> добавлено +${val.toLocaleString('ru-RU')} ₽!`);
+      }
+    }
+
+    function markWishBought(id) {
+      triggerHaptic('success');
+      const w = wishlist.find(x => x.id === id);
+      if (w) {
+        w.bought = true;
+        w.saved = w.cost;
+        w.boughtAt = new Date().toLocaleDateString('ru-RU');
+        saveState();
+        renderWishlistTab();
+        renderDashboard();
+        showNotification(`🎉 ПОЗДРАВЛЯЕМ! Мечта <b>«${escapeHtml(w.title)}»</b> исполнена!`);
+      }
+    }
+
+    function deleteWish(id) {
+      triggerHaptic('heavy');
+      wishlist = wishlist.filter(x => x.id !== id);
+      saveState();
+      renderWishlistTab();
+      renderDashboard();
+    }
+
+    // --- TAB 5: GROWTH (GOALS & HABITS) ---
+    function renderGrowthTab() {
+      // Goals
+      const gEl = document.getElementById('goals-full-list');
+      gEl.innerHTML = goals.map(g => `
+        <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">${g.icon}</span>
+            <div>
+              <h4 class="text-sm font-bold text-white">${escapeHtml(g.title)}</h4>
+              <p class="text-[10px] text-slate-400">Дедлайн: ${formatDate(g.due)}</p>
+            </div>
+          </div>
+          <span class="text-xs text-cyan-400 font-bold">Активна</span>
+        </div>
+      `).join('');
+
+      // Habits
+      const hEl = document.getElementById('habits-full-list');
+      const nowStr = new Date().toISOString().split('T')[0];
+      hEl.innerHTML = habits.map(h => {
+        const isDone = h.lastDoneDate === nowStr;
         return `
-          <div class="glass-card rounded-2xl p-4 border ${isDoneToday ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-slate-800'} flex items-center justify-between">
-            <div class="flex items-center space-x-3.5">
-              <span class="text-2xl">${h.icon}</span>
+          <div class="glass-card rounded-2xl p-3 border ${isDone ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-slate-800'} flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <span class="text-xl">${h.icon}</span>
               <div>
-                <h4 class="text-sm font-bold text-white">${escapeHtml(h.title)}</h4>
-                <div class="flex items-center space-x-2 text-xs mt-0.5">
-                  <span class="text-amber-400 font-bold flex items-center gap-0.5">
-                    <span>🔥</span> Стрик: ${h.streak} ${getNoun(h.streak, 'день', 'дня', 'дней')} подряд
-                  </span>
-                </div>
+                <h4 class="text-xs font-bold text-white">${escapeHtml(h.title)}</h4>
+                <div class="text-[10px] text-amber-400 font-semibold">🔥 Стрик: ${h.streak} дн.</div>
               </div>
             </div>
-
-            <button onclick="toggleHabit('${h.id}')" class="px-4 py-2 rounded-xl ${isDoneToday ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-dark-card border border-slate-700 text-slate-300 hover:border-emerald-400'} text-xs font-bold active:scale-95 transition-all">
-              ${isDoneToday ? '✓ Готово' : 'Отметить'}
+            <button onclick="toggleHabit('${h.id}')" class="px-3 py-1.5 rounded-xl ${isDone ? 'bg-emerald-500 text-white' : 'bg-dark-bg border border-slate-700 text-slate-300'} text-xs font-bold">
+              ${isDone ? '✓ Готово' : 'Отметить'}
             </button>
           </div>
         `;
       }).join('');
-    }
-
-    // --- ACTIONS: TOGGLE, DELETE, ADD ---
-    function toggleTask(id) {
-      triggerHaptic('success');
-      const task = tasks.find(t => t.id === id);
-      if (task) {
-        task.completed = !task.completed;
-        saveState();
-        refreshCurrentView();
-      }
-    }
-
-    function deleteTask(id) {
-      triggerHaptic('heavy');
-      tasks = tasks.filter(t => t.id !== id);
-      saveState();
-      refreshCurrentView();
     }
 
     function toggleHabit(id) {
@@ -964,20 +1632,12 @@
           h.streak += 1;
         }
         saveState();
-        renderTracksTab();
+        renderGrowthTab();
         renderDashboard();
       }
     }
 
-    function refreshCurrentView() {
-      if (currentTab === 'tasks') renderTasksTab();
-      else if (currentTab === 'matrix') renderMatrixTab();
-      else if (currentTab === 'goals') renderGoalsTab();
-      else if (currentTab === 'tracks') renderTracksTab();
-      renderDashboard();
-    }
-
-    // --- POMODORO TIMER ---
+    // Pomodoro
     let pomoInterval = null;
     let pomoSeconds = 25 * 60;
     let pomoRunning = false;
@@ -990,11 +1650,9 @@
         clearInterval(pomoInterval);
         pomoRunning = false;
         btn.textContent = 'Продолжить';
-        btn.className = 'px-6 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm';
       } else {
         pomoRunning = true;
         btn.textContent = 'Пауза';
-        btn.className = 'px-6 py-2.5 rounded-2xl bg-amber-500 text-white font-bold text-sm';
         pomoInterval = setInterval(() => {
           if (pomoSeconds > 0) {
             pomoSeconds--;
@@ -1017,9 +1675,7 @@
       pomoRunning = false;
       pomoSeconds = 25 * 60;
       updatePomoDisplay();
-      const btn = document.getElementById('pomo-toggle-btn');
-      btn.textContent = 'Старт';
-      btn.className = 'px-6 py-2.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-sm';
+      document.getElementById('pomo-toggle-btn').textContent = 'Старт';
     }
 
     function updatePomoDisplay() {
@@ -1028,42 +1684,87 @@
       document.getElementById('pomo-timer-display').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     }
 
-    // --- MODALS ---
-    function openAddTaskModal(goalId = '') {
+    // AI Coach
+    function generateAICoachInsight() {
+      const nowStr = new Date().toISOString().split('T')[0];
+      const burning = tasks.filter(t => !t.completed && (t.priority === 'p1' || (t.due && t.due <= nowStr)));
+      const pendingHw = homework.filter(h => !h.completed);
+      const activeWishes = wishlist.filter(w => !w.bought);
+      const insightEl = document.getElementById('ai-insight-text');
+      const statusEl = document.getElementById('ai-status-tag');
+
+      if (burning.length > 0) {
+        statusEl.textContent = 'Горят задачи';
+        statusEl.className = 'text-[10px] font-semibold text-rose-400 bg-rose-950/60 border border-rose-800/40 px-2 py-0.5 rounded-full';
+        insightEl.innerHTML = `🔥 У тебя <b>${burning.length} горящих задач</b>. Закрой в первую очередь <b>«${escapeHtml(burning[0].title)}»</b>!`;
+      } else if (pendingHw.length > 0) {
+        statusEl.textContent = 'Универ';
+        statusEl.className = 'text-[10px] font-semibold text-sky-400 bg-sky-950/60 border border-sky-800/40 px-2 py-0.5 rounded-full';
+        insightEl.innerHTML = `📚 По универу висит <b>${pendingHw.length} заданий</b>. Сделай одно прямо сейчас, чтобы не копить долги!`;
+      } else if (activeWishes.length > 0) {
+        statusEl.textContent = 'Движение к мечте';
+        statusEl.className = 'text-[10px] font-semibold text-amber-400 bg-amber-950/60 border border-amber-800/40 px-2 py-0.5 rounded-full';
+        insightEl.innerHTML = `🎯 Ты копишь на <b>«${escapeHtml(activeWishes[0].title)}»</b>. За каждую закрытую задачу откладывай маленький бонус в копилку!`;
+      } else {
+        statusEl.textContent = 'В ресурсе';
+        statusEl.className = 'text-[10px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded-full';
+        insightEl.innerHTML = `✨ Всё чисто! Задачи закрыты, дедлайны под контролем. Отличный день!`;
+      }
+    }
+
+    function refreshAICoach(sound = false) {
+      if (sound) triggerHaptic('light');
+      generateAICoachInsight();
+    }
+    function openAICoachModal() {
+      triggerHaptic('light');
+      document.getElementById('modal-ai-coach').classList.remove('hidden');
+    }
+    function closeAICoachModal() { document.getElementById('modal-ai-coach').classList.add('hidden'); }
+    function sendCustomAIQuery() {
+      const q = document.getElementById('ai-user-query').value.trim();
+      if (!q) return;
+      triggerHaptic('success');
+      document.getElementById('ai-custom-response').innerHTML = `
+        <div class="space-y-1">
+          <p class="text-purple-300 font-bold">Вопрос: «${escapeHtml(q)}»</p>
+          <p class="text-slate-200">🤖 <b>AI Коуч:</b> Разбей действие на микро-шаг и поставь таймер Pomodoro на 25 мин. Помни, ради какой цели ты это делаешь!</p>
+        </div>
+      `;
+      document.getElementById('ai-user-query').value = '';
+    }
+
+    function aiAutoDecompose() {
+      const title = document.getElementById('task-title-input').value.trim();
+      if (!title) return alert('Введите название задачи');
+      triggerHaptic('success');
+      document.getElementById('task-note-input').value = `1. Собрать материалы и план\n2. Сделать черновик\n3. Финальная проверка`;
+      alert('✨ AI разбил задачу на 3 шага!');
+    }
+
+    // Modal controls for Task / Goal / Habit
+    function openAddTaskModal() {
       triggerHaptic('light');
       document.getElementById('task-title-input').value = '';
       document.getElementById('task-note-input').value = '';
       document.getElementById('task-priority-input').value = 'p2';
       document.getElementById('task-due-input').value = todayStr;
-      
-      // Populate goals select
-      const select = document.getElementById('task-goal-input');
-      select.innerHTML = '<option value="">Без цели</option>' + goals.map(g => `<option value="${g.id}" ${g.id === goalId ? 'selected' : ''}>${g.icon} ${escapeHtml(g.title)}</option>`).join('');
-
       document.getElementById('modal-task').classList.remove('hidden');
-      setTimeout(() => document.getElementById('task-title-input').focus(), 100);
     }
-
-    function closeTaskModal() {
-      document.getElementById('modal-task').classList.add('hidden');
-    }
-
+    function closeTaskModal() { document.getElementById('modal-task').classList.add('hidden'); }
     function saveTaskFromModal() {
       const title = document.getElementById('task-title-input').value.trim();
-      if (!title) return alert('Введите название задачи');
-
-      const newTask = {
+      if (!title) return alert('Введите название');
+      tasks.unshift({
         id: 't_' + Date.now(),
         title,
         note: document.getElementById('task-note-input').value.trim(),
         priority: document.getElementById('task-priority-input').value,
         due: document.getElementById('task-due-input').value,
         category: document.getElementById('task-category-input').value,
-        goalId: document.getElementById('task-goal-input').value,
-        completed: false
-      };
-
-      tasks.unshift(newTask);
+        completed: false,
+        completedAt: null
+      });
       saveState();
       closeTaskModal();
       triggerHaptic('success');
@@ -1074,53 +1775,40 @@
       triggerHaptic('light');
       document.getElementById('modal-goal').classList.remove('hidden');
     }
-    function closeGoalModal() {
-      document.getElementById('modal-goal').classList.add('hidden');
-    }
+    function closeGoalModal() { document.getElementById('modal-goal').classList.add('hidden'); }
     function saveGoalFromModal() {
       const title = document.getElementById('goal-title-input').value.trim();
-      if (!title) return alert('Введите название цели');
-      const newGoal = {
-        id: 'g_' + Date.now(),
-        title,
-        icon: document.getElementById('goal-icon-input').value.trim() || '🎯',
-        due: document.getElementById('goal-due-input').value,
-        completed: false
-      };
-      goals.unshift(newGoal);
+      if (!title) return alert('Введите название');
+      goals.unshift({ id: 'g_' + Date.now(), title, icon: '🎯', due: document.getElementById('goal-due-input').value, completed: false });
       saveState();
       closeGoalModal();
       triggerHaptic('success');
-      renderGoalsTab();
-      renderDashboard();
+      refreshCurrentView();
     }
 
     function openAddHabitModal() {
       triggerHaptic('light');
       document.getElementById('modal-habit').classList.remove('hidden');
     }
-    function closeHabitModal() {
-      document.getElementById('modal-habit').classList.add('hidden');
-    }
+    function closeHabitModal() { document.getElementById('modal-habit').classList.add('hidden'); }
     function saveHabitFromModal() {
       const title = document.getElementById('habit-title-input').value.trim();
-      if (!title) return alert('Введите название привычки');
-      const newHabit = {
-        id: 'h_' + Date.now(),
-        title,
-        icon: document.getElementById('habit-icon-input').value.trim() || '⚡',
-        streak: 0,
-        lastDoneDate: ''
-      };
-      habits.push(newHabit);
+      if (!title) return alert('Введите название');
+      habits.push({ id: 'h_' + Date.now(), title, icon: '⚡', streak: 0, lastDoneDate: '' });
       saveState();
       closeHabitModal();
       triggerHaptic('success');
-      renderTracksTab();
+      refreshCurrentView();
+    }
+
+    function refreshCurrentView() {
+      if (currentTab === 'tasks') renderTasksTab();
+      else if (currentTab === 'study') renderStudyTab();
+      else if (currentTab === 'wishlist') renderWishlistTab();
+      else if (currentTab === 'growth') renderGrowthTab();
       renderDashboard();
     }
 
-    // --- UTILITIES ---
     function formatDate(dStr) {
       if (!dStr) return '';
       const parts = dStr.split('-');
@@ -1129,8 +1817,7 @@
     }
 
     function getNoun(number, one, two, five) {
-      let n = Math.abs(number);
-      n %= 100;
+      let n = Math.abs(number) % 100;
       if (n >= 5 && n <= 20) return five;
       n %= 10;
       if (n === 1) return one;
@@ -1143,8 +1830,10 @@
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // Initial render
+    // App Startup
     renderDashboard();
+    syncFromTelegramCloud();
+    checkImportedTask();
   </script>
 </body>
 </html>
