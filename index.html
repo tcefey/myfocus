@@ -87,9 +87,9 @@
       <div>
         <div class="flex items-center gap-1.5">
           <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Focus OS</span>
-          <span id="cloud-sync-status" class="px-1.5 py-0.5 rounded-full text-[9px] bg-emerald-950/80 text-emerald-400 border border-emerald-800/40 font-semibold flex items-center gap-0.5">
+          <button onclick="openBackupModal()" id="cloud-sync-status" class="px-1.5 py-0.5 rounded-full text-[9px] bg-emerald-950/80 hover:bg-emerald-900/80 text-emerald-400 border border-emerald-800/40 font-semibold flex items-center gap-0.5 cursor-pointer active:scale-95 transition-all" title="Резервное копирование и облако">
             <span>☁️</span> Облако
-          </span>
+          </button>
         </div>
         <p id="user-greeting" class="text-base font-bold text-white tracking-tight">Привет, Чемпион!</p>
       </div>
@@ -97,6 +97,10 @@
 
     <!-- Quick Header Actions -->
     <div class="flex items-center space-x-2">
+      <!-- Backup button -->
+      <button onclick="openBackupModal()" title="Резервное копирование и облако" class="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-purple-300 shadow-md active:scale-95 transition-transform">
+        <span class="text-xs">💾</span>
+      </button>
       <!-- Pomodoro button -->
       <button onclick="openPomodoroModal()" title="Таймер фокуса" class="w-9 h-9 rounded-xl bg-cyan-600/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 shadow-md active:scale-95 transition-transform">
         <span class="text-xs font-bold font-mono">⏱️</span>
@@ -280,10 +284,11 @@
         </div>
 
         <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs font-semibold">
-          <button onclick="setTaskFilter('all')" id="filter-pill-all" class="px-3.5 py-1.5 rounded-xl bg-cyan-500 text-white shadow-sm flex-shrink-0 transition-all font-bold">Активные</button>
-          <button onclick="setTaskFilter('burning')" id="filter-pill-burning" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-rose-400 flex items-center gap-1 flex-shrink-0 transition-all">🔥 Горит</button>
-          <button onclick="setTaskFilter('today')" id="filter-pill-today" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all">Сегодня</button>
-          <button onclick="setTaskFilter('week')" id="filter-pill-week" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all">На неделю</button>
+          <button onclick="setTaskFilter('all')" id="filter-pill-all" class="px-3.5 py-1.5 rounded-xl bg-cyan-500 text-white shadow-sm flex-shrink-0 transition-all font-bold">Все активные</button>
+          <button onclick="setTaskFilter('overdue')" id="filter-pill-overdue" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-rose-400 flex items-center gap-1 flex-shrink-0 transition-all font-medium">⚠️ Просрочено</button>
+          <button onclick="setTaskFilter('burning')" id="filter-pill-burning" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-amber-400 flex items-center gap-1 flex-shrink-0 transition-all font-medium">🔥 Горит</button>
+          <button onclick="setTaskFilter('today')" id="filter-pill-today" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all font-medium">Сегодня</button>
+          <button onclick="setTaskFilter('week')" id="filter-pill-week" class="px-3.5 py-1.5 rounded-xl bg-dark-card border border-dark-border text-slate-300 flex-shrink-0 transition-all font-medium">На неделю</button>
           <button onclick="openHistoryModal()" class="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 flex items-center gap-1 flex-shrink-0 transition-all">📂 Папка истории</button>
         </div>
       </div>
@@ -703,7 +708,12 @@
         </div>
         <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white p-1 text-lg">✕</button>
       </div>
-      <div id="history-items-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1 min-h-[200px]"></div>
+      <div id="history-items-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1 min-h-[180px]"></div>
+      <div class="pt-2 border-t border-slate-800">
+        <button onclick="restoreAllTasksFromHistory()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-bold active:scale-95 transition-all flex items-center justify-center gap-1.5">
+          <span>↩️</span> Вернуть все задачи из архива
+        </button>
+      </div>
     </div>
   </div>
 
@@ -860,6 +870,67 @@
         <input type="text" id="ai-user-query" placeholder="Спросить коуча: например, как не прокрастинировать..." class="flex-1 bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2.5 text-xs text-white">
         <button onclick="sendCustomAIQuery()" class="px-4 py-2.5 rounded-xl bg-purple-500 text-white font-bold text-xs">Отправить</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: BACKUP & CLOUD STORAGE -->
+  <div id="modal-backup" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="glass-card bg-dark-bg/95 border border-purple-500/30 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl animate-fade-in">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">💾</span>
+          <div>
+            <h3 class="text-base font-bold text-white">Резервное копирование</h3>
+            <p id="backup-summary-stats" class="text-[10px] text-purple-300 font-semibold">Все данные защищены</p>
+          </div>
+        </div>
+        <button onclick="closeBackupModal()" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors">✕</button>
+      </div>
+
+      <!-- Cloud & Bot Status Cards -->
+      <div class="space-y-2">
+        <div class="p-3 rounded-2xl bg-slate-900/70 border border-emerald-500/30 flex items-center justify-between">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-sm">☁️</div>
+            <div>
+              <p class="text-xs font-bold text-white">Telegram CloudStorage</p>
+              <p class="text-[10px] text-slate-400">Облако Telegram привязано к аккаунту</p>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Активно</span>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-slate-900/70 border border-purple-500/30 flex items-center justify-between">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 text-sm">🤖</div>
+            <div>
+              <p class="text-xs font-bold text-white">Бэкап в чате Telegram</p>
+              <p class="text-[10px] text-slate-400">Команда <code>/backup</code> пришлёт файл в чат</p>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">В боте</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-2.5 pt-1">
+        <button onclick="exportFullBackupJSON()" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 active:scale-95 transition-all">
+          <span>📥</span> Скачать полный бэкап (JSON)
+        </button>
+
+        <button onclick="document.getElementById('backup-file-input').click()" class="w-full py-3 px-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold flex items-center justify-center gap-2 active:scale-95 transition-all">
+          <span>📤</span> Восстановить из файла бэкапа
+        </button>
+        <input type="file" id="backup-file-input" accept=".json" onchange="importBackupFile(event)" class="hidden">
+
+        <button onclick="syncFromTelegramCloudManual()" class="w-full py-2.5 px-4 rounded-2xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700 text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 active:scale-95 transition-all">
+          <span>🔄</span> Принудительно обновить из облака
+        </button>
+      </div>
+
+      <p class="text-[10px] text-slate-400 text-center leading-relaxed">
+        Файл бэкапа содержит задачи, расписание пар, тренировки, привычки и хотелки. Храните его надежно!
+      </p>
     </div>
   </div>
 
@@ -1063,9 +1134,337 @@
     ];
 
     const DEFAULT_TASKS = [
-      { id: 't1', title: 'Подготовить доклад к семинару', note: 'Сделать 8 слайдов', priority: 'p1', due: todayStr, category: 'Универ', completed: false, completedAt: null },
-      { id: 't2', title: 'Сдать реферат по истории', note: 'Отправить преподавателю', priority: 'p2', due: getOffsetDate(1), category: 'Универ', completed: false, completedAt: null }
-    ];
+      {
+            "id": "t_1792543133433",
+            "title": "Дать расчет молдингов Косте",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-10-21",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493782623",
+            "title": "Разбить цель сдать хск на конец второго семестра",
+            "note": "",
+            "priority": "p3",
+            "due": "2026-10-25",
+            "category": "Универ",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493704362",
+            "title": "Составить образовательную систему",
+            "note": "",
+            "priority": "p3",
+            "due": "2026-10-23",
+            "category": "Разное",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493532298",
+            "title": "Составить распорядок дня",
+            "note": "",
+            "priority": "p4",
+            "due": "2026-10-21",
+            "category": "Разное",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493515854",
+            "title": "Добавить инфу по универу",
+            "note": "Расписание, аудитории и тд",
+            "priority": "p4",
+            "due": "2026-10-21",
+            "category": "Разное",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493484754",
+            "title": "Написать список хотелок",
+            "note": "",
+            "priority": "p4",
+            "due": "2026-10-25",
+            "category": "Разное",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493408001",
+            "title": "Узнать что нужно купить родителям",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-10-21",
+            "category": "Разное",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493207329",
+            "title": "Запустить конвеер веток для Threads для привлечения подписчкиов в тг канал",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-10-21",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493163665",
+            "title": "Найти спортзал+составить тренировку",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-10-21",
+            "category": "Спортзал",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493084942",
+            "title": "Найти моторчик для поилки для Рокки",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-10-21",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493072412",
+            "title": "Сделать замену кормушки для Рокки",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-10-21",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792493042275",
+            "title": "Проработать полностью карточку бахтмухри",
+            "note": "От а до я, сео, реклама, креативы, подключить апи к ИИ",
+            "priority": "p2",
+            "due": "2026-10-21",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792492995114",
+            "title": "Добавить карточку нового бахтмухри в общую",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-10-21",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792492948554",
+            "title": "Найти клеющиеся плитки на стены для Бахти",
+            "note": "Цена опт",
+            "priority": "p2",
+            "due": "2026-10-21",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792492891464",
+            "title": "Сделать расчет на закуп под бахтмухри",
+            "note": "Написать поставщикам, вывести общую сумму и закупить",
+            "priority": "p2",
+            "due": "2026-10-21",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794578942479",
+            "title": "Сделать магаз снюса и стиков",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": true,
+            "completedAt": "13.11.2026 22:09"
+      },
+      {
+            "id": "t_1794578891451",
+            "title": "Тг бот по покупке билетов в парки и тд в китае",
+            "note": "Что бы люди могли покупать в своей валюте билеты без заморочек",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794578682197",
+            "title": "Брать узкие ниши, по типу оборудований, лить на них трафик и продавать в снг",
+            "note": "Делать тематичские проф каналы, паблики, от куда делать продаиж каких то узкоспециализторанных товаров, по типу серверных оборудований, тяжелой техники и тд",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794578478777",
+            "title": "Нарезки Гта 6",
+            "note": "Поднять н а этом бабки",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794578317022",
+            "title": "Начать работать над ии агентами",
+            "note": "Для бизнеса, сделать пилотную версию, выбрать одну нишу и с этой пилотной версией ходить и продавать агентов им,",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794578267228",
+            "title": "Написать письмо трипу",
+            "note": "Об агенте по обработке заявок",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794578206028",
+            "title": "Найти транскрибатор видосов",
+            "note": "Что бы грузить в него файлы видео и что бы на основе инфы курсов обучался и делал мне результат",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794577706574",
+            "title": "Передать  жене",
+            "note": "Усилитель вайфая, насос для носа 2 шт, хард один вернуть новый заказать,",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794576833493",
+            "title": "Залив трафика через тредс",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794576717916",
+            "title": "Тг бот парсер событий в мире ии и новостей",
+            "note": "Через Х, сияохонгшу, другие источники информации, сми, тг каналы, реддит",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794576632198",
+            "title": "Подключить кодекс что бы делал задания по 多媒体",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794575884451",
+            "title": "Проект со свечами",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794575871070",
+            "title": "Проект с бадами",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794575834268",
+            "title": "Аудит карточки на узум",
+            "note": "Бахт мухри, подключить ии, отчеты каждый день, слежка за позицей, ценой конкурентов, содержанием карточки, инфографикой",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794575703692",
+            "title": "Выбрать подарок маме",
+            "note": "передать через женю",
+            "priority": "p2",
+            "due": "2026-11-15",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792564082290",
+            "title": "Решить вопрос с алипеем, почему у меня лимиты",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-10-22",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1792552427613",
+            "title": "Определиться с оборудованием по тофу наполнителю",
+            "note": "",
+            "priority": "p1",
+            "due": "2026-10-23",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      },
+      {
+            "id": "t_1794579779227",
+            "title": "Серверное оборудование Алексей",
+            "note": "",
+            "priority": "p2",
+            "due": "2026-11-14",
+            "category": "Работа",
+            "completed": false,
+            "completedAt": null
+      }
+];
 
     const DEFAULT_HABITS = [
       { id: 'h1', title: 'Учеба / Конспекты 1ч', icon: '📚', streak: 4, lastDoneDate: todayStr },
@@ -1079,8 +1478,45 @@
       return d.toISOString().split('T')[0];
     }
 
-    // Load state
-    let tasks = JSON.parse(localStorage.getItem(CLOUD_KEYS.TASKS)) || DEFAULT_TASKS;
+    function smartMergeLists(localList, incomingList) {
+      if (!Array.isArray(incomingList) || incomingList.length === 0) return localList || [];
+      if (!Array.isArray(localList) || localList.length === 0) return incomingList || [];
+
+      const map = new Map();
+      // Add incoming/cloud items first
+      incomingList.forEach(item => {
+        if (item && item.id) map.set(String(item.id), item);
+      });
+      // Local items override incoming items (user's immediate local changes take precedence)
+      localList.forEach(item => {
+        if (item && item.id) map.set(String(item.id), item);
+      });
+      return Array.from(map.values());
+    }
+
+    // Load state safely with multi-key recovery
+    let tasks = [];
+    try {
+      tasks = JSON.parse(localStorage.getItem(CLOUD_KEYS.TASKS)) || [];
+    } catch(e) { tasks = []; }
+
+    // Automatic recovery from all possible historical/backup keys
+    const RECOVERY_KEYS = ['tma_tasks_backup', 'myfocus_tasks_backup', 'tma_tasks_v4', 'tma_tasks_v3', 'tma_tasks_v2', 'tma_tasks', 'tasks', 'myfocus_tasks'];
+    RECOVERY_KEYS.forEach(k => {
+      try {
+        const stored = localStorage.getItem(k);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            tasks = smartMergeLists(tasks, parsed);
+          }
+        }
+      } catch(e) {}
+    });
+
+    // Merge with DEFAULT_TASKS so no default or voice tasks are lost
+    tasks = smartMergeLists(tasks, DEFAULT_TASKS);
+
     let schedule = JSON.parse(localStorage.getItem(CLOUD_KEYS.SCHEDULE)) || DEFAULT_SCHEDULE;
     let homework = JSON.parse(localStorage.getItem(CLOUD_KEYS.HOMEWORK)) || DEFAULT_HOMEWORK;
     let wishlist = JSON.parse(localStorage.getItem(CLOUD_KEYS.WISHLIST)) || DEFAULT_WISHLIST;
@@ -1088,24 +1524,28 @@
     let routine = JSON.parse(localStorage.getItem(CLOUD_KEYS.ROUTINE)) || DEFAULT_ROUTINE;
     let gym = JSON.parse(localStorage.getItem(CLOUD_KEYS.GYM)) || DEFAULT_GYM;
 
-    // SAVE STATE (LocalStorage + Telegram CloudStorage)
+    // SAVE STATE (LocalStorage + Telegram CloudStorage safely)
     function saveState() {
-      localStorage.setItem(CLOUD_KEYS.TASKS, JSON.stringify(tasks));
-      localStorage.setItem(CLOUD_KEYS.SCHEDULE, JSON.stringify(schedule));
-      localStorage.setItem(CLOUD_KEYS.HOMEWORK, JSON.stringify(homework));
-      localStorage.setItem(CLOUD_KEYS.WISHLIST, JSON.stringify(wishlist));
-      localStorage.setItem(CLOUD_KEYS.HABITS, JSON.stringify(habits));
-      localStorage.setItem(CLOUD_KEYS.ROUTINE, JSON.stringify(routine));
-      localStorage.setItem(CLOUD_KEYS.GYM, JSON.stringify(gym));
+      try {
+        localStorage.setItem(CLOUD_KEYS.TASKS, JSON.stringify(tasks));
+        localStorage.setItem('tma_tasks_backup', JSON.stringify(tasks));
+        localStorage.setItem(CLOUD_KEYS.SCHEDULE, JSON.stringify(schedule));
+        localStorage.setItem(CLOUD_KEYS.HOMEWORK, JSON.stringify(homework));
+        localStorage.setItem(CLOUD_KEYS.WISHLIST, JSON.stringify(wishlist));
+        localStorage.setItem(CLOUD_KEYS.HABITS, JSON.stringify(habits));
+        localStorage.setItem(CLOUD_KEYS.ROUTINE, JSON.stringify(routine));
+        localStorage.setItem(CLOUD_KEYS.GYM, JSON.stringify(gym));
+      } catch (e) {
+        console.error("Local save error:", e);
+      }
 
       if (tg?.CloudStorage) {
-        tg.CloudStorage.setItem(CLOUD_KEYS.TASKS, JSON.stringify(tasks));
-        tg.CloudStorage.setItem(CLOUD_KEYS.SCHEDULE, JSON.stringify(schedule));
-        tg.CloudStorage.setItem(CLOUD_KEYS.HOMEWORK, JSON.stringify(homework));
-        tg.CloudStorage.setItem(CLOUD_KEYS.WISHLIST, JSON.stringify(wishlist));
-        tg.CloudStorage.setItem(CLOUD_KEYS.HABITS, JSON.stringify(habits));
-        tg.CloudStorage.setItem(CLOUD_KEYS.ROUTINE, JSON.stringify(routine));
-        tg.CloudStorage.setItem(CLOUD_KEYS.GYM, JSON.stringify(gym));
+        try {
+          const tStr = JSON.stringify(tasks);
+          if (tStr.length < 4000) {
+            tg.CloudStorage.setItem(CLOUD_KEYS.TASKS, tStr, () => {});
+          }
+        } catch(e) {}
       }
     }
 
@@ -1115,20 +1555,48 @@
       tg.CloudStorage.getItems(keys, (err, res) => {
         if (!err && res) {
           try {
-            if (res[CLOUD_KEYS.TASKS]) tasks = JSON.parse(res[CLOUD_KEYS.TASKS]);
-            if (res[CLOUD_KEYS.SCHEDULE]) schedule = JSON.parse(res[CLOUD_KEYS.SCHEDULE]);
-            if (res[CLOUD_KEYS.HOMEWORK]) homework = JSON.parse(res[CLOUD_KEYS.HOMEWORK]);
-            if (res[CLOUD_KEYS.WISHLIST]) wishlist = JSON.parse(res[CLOUD_KEYS.WISHLIST]);
-            if (res[CLOUD_KEYS.HABITS]) habits = JSON.parse(res[CLOUD_KEYS.HABITS]);
-            if (res[CLOUD_KEYS.ROUTINE]) routine = JSON.parse(res[CLOUD_KEYS.ROUTINE]);
-            if (res[CLOUD_KEYS.GYM]) gym = JSON.parse(res[CLOUD_KEYS.GYM]);
-            refreshCurrentView();
-          } catch(e){}
+            let changed = false;
+            if (res[CLOUD_KEYS.TASKS]) {
+              const cloudTasks = JSON.parse(res[CLOUD_KEYS.TASKS]);
+              if (Array.isArray(cloudTasks) && cloudTasks.length > 0) {
+                const prevCount = tasks.length;
+                tasks = smartMergeLists(tasks, cloudTasks);
+                if (tasks.length !== prevCount) changed = true;
+              }
+            }
+            if (res[CLOUD_KEYS.WISHLIST]) {
+              const cloudWish = JSON.parse(res[CLOUD_KEYS.WISHLIST]);
+              if (Array.isArray(cloudWish) && cloudWish.length > 0) {
+                wishlist = smartMergeLists(wishlist, cloudWish);
+                changed = true;
+              }
+            }
+            if (res[CLOUD_KEYS.HABITS]) {
+              const cloudHabits = JSON.parse(res[CLOUD_KEYS.HABITS]);
+              if (Array.isArray(cloudHabits) && cloudHabits.length > 0) {
+                habits = smartMergeLists(habits, cloudHabits);
+                changed = true;
+              }
+            }
+            if (res[CLOUD_KEYS.ROUTINE]) {
+              const cloudRoutine = JSON.parse(res[CLOUD_KEYS.ROUTINE]);
+              if (Array.isArray(cloudRoutine) && cloudRoutine.length > 0) {
+                routine = smartMergeLists(routine, cloudRoutine);
+                changed = true;
+              }
+            }
+            if (changed) {
+              saveState();
+              refreshCurrentView();
+            }
+          } catch(e) {
+            console.warn("Cloud sync error:", e);
+          }
         }
       });
     }
 
-    // CHECK URL SEARCH & HASH FOR BOT TASK AUTO-IMPORT (Solves Problem #6)
+    // CHECK URL SEARCH & HASH FOR BOT TASK AUTO-IMPORT
     function checkImportedTask() {
       let rawData = null;
       // 1. Check URL query string
@@ -1148,19 +1616,152 @@
         }
       }
 
+      // Check multi-task batch sync from bot
+      let allRaw = null;
+      if (urlParams.has('import_all')) allRaw = urlParams.get('import_all');
+      if (!allRaw && window.location.hash) {
+        const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        if (hashParams.has('import_all')) allRaw = hashParams.get('import_all');
+      }
+
+      if (allRaw) {
+        try {
+          const list = JSON.parse(decodeURIComponent(allRaw));
+          if (Array.isArray(list) && list.length > 0) {
+            let importedCount = 0;
+            list.forEach(item => {
+              const itemTitle = item.display_title || item.clean_title || item.title;
+              const due = item.due || todayStr;
+              if (item.target === 'routine' || item.target === 'routine_and_task' || item.time) {
+                if (item.time && !routine.some(r => r.time === item.time && r.title.toLowerCase() === (item.clean_title || item.title).toLowerCase())) {
+                  routine.push({ id: 'r_' + Date.now() + Math.random(), time: item.time, title: item.clean_title || item.title, icon: item.icon || '💪', done: false });
+                }
+              }
+              if (item.target === 'wishlist') {
+                if (!wishlist.some(w => w.title === (item.clean_title || item.title))) {
+                  wishlist.unshift({ id: 'w_' + Date.now() + Math.random(), title: item.clean_title || item.title, cost: item.cost || 0, saved: 0, due: due, type: 'regular', completed: false });
+                }
+              }
+              if (!tasks.some(t => t.id === item.id || (t.title === itemTitle && t.due === due))) {
+                tasks.unshift({
+                  id: item.id || ('t_' + Date.now() + Math.random()),
+                  title: itemTitle,
+                  note: item.raw_text ? `Голос: «${item.raw_text}»` : '',
+                  priority: item.priority || 'p2',
+                  due: due,
+                  category: item.category || 'Задачи',
+                  completed: false,
+                  completedAt: null
+                });
+                importedCount++;
+              }
+            });
+            routine.sort((a, b) => a.time.localeCompare(b.time));
+            saveState();
+            refreshCurrentView();
+            if (importedCount > 0) {
+              showNotification(`📥 Синхронизировано дел из бота: <b>${importedCount}</b>`);
+              triggerHaptic('success');
+            }
+          }
+        } catch(e) {}
+      }
+
       if (rawData) {
         try {
-          const taskObj = JSON.parse(decodeURIComponent(rawData));
-          if (taskObj && taskObj.title) {
-            if (!tasks.some(t => t.id === taskObj.id || (t.title === taskObj.title && t.due === taskObj.due))) {
-              tasks.unshift(taskObj);
-              saveState();
-              showNotification(`📥 Задача от бота <b>«${escapeHtml(taskObj.title)}»</b> успешно сохранена в Focus OS!`);
-              triggerHaptic('success');
-              try {
-                window.history.replaceState({}, document.title, window.location.pathname);
-              } catch(e){}
+          const payload = JSON.parse(decodeURIComponent(rawData));
+          if (payload && (payload.clean_title || payload.title)) {
+            const title = payload.clean_title || payload.title;
+            const time = payload.time;
+            const due = payload.due || todayStr;
+            const target = payload.target || 'task';
+            const icon = payload.icon || '⚡';
+            let notificationMsg = '';
+
+            // 1. ROUTINE / РАСПОРЯДОК ДНЯ
+            if (target === 'routine' || target === 'routine_and_task' || payload.category === 'Распорядок дня') {
+              if (time) {
+                const existing = routine.find(r => r.time === time && r.title.toLowerCase() === title.toLowerCase());
+                if (!existing) {
+                  routine.push({
+                    id: 'r_' + Date.now(),
+                    time: time,
+                    title: title,
+                    icon: icon,
+                    done: false
+                  });
+                  routine.sort((a, b) => a.time.localeCompare(b.time));
+                }
+              }
             }
+
+            // 2. HOMEWORK / УНИВЕР
+            if (target === 'homework') {
+              const subj = payload.subject || 'Универ';
+              if (!homework.some(h => h.title === title && h.due === due)) {
+                homework.unshift({
+                  id: 'hw_' + Date.now(),
+                  subject: subj,
+                  title: title,
+                  due: due,
+                  completed: false
+                });
+              }
+              notificationMsg = `📚 Домашка по <b>«${escapeHtml(subj)}»</b> сохранена в Универ!`;
+            }
+
+            // 3. WISHLIST / ХОТЕЛКИ
+            else if (target === 'wishlist') {
+              const cost = payload.cost || 0;
+              if (!wishlist.some(w => w.title === title)) {
+                wishlist.unshift({
+                  id: 'w_' + Date.now(),
+                  title: title,
+                  cost: cost,
+                  saved: 0,
+                  due: due || '',
+                  type: cost > 1000 ? 'big' : 'regular',
+                  photoUrl: '',
+                  notes: payload.raw_text ? `Голос: «${payload.raw_text}»` : '',
+                  completed: false
+                });
+              }
+              notificationMsg = `🎁 <b>«${escapeHtml(title)}» (${cost} ¥)</b> сохранено в Хотелки!`;
+            }
+
+            // 4. TASKS / ЗАДАЧИ
+            if (target === 'task' || target === 'routine_and_task' || !notificationMsg) {
+              const taskTitle = payload.display_title || title;
+              if (!tasks.some(t => t.id === payload.id || (t.title === taskTitle && t.due === due))) {
+                tasks.unshift({
+                  id: payload.id || ('t_' + Date.now()),
+                  title: taskTitle,
+                  note: payload.raw_text ? `Голос: «${payload.raw_text}»` : '',
+                  priority: payload.priority || 'p2',
+                  due: due,
+                  category: payload.category || 'Задачи',
+                  completed: false,
+                  completedAt: null
+                });
+              }
+              if (!notificationMsg) {
+                if (target === 'routine_and_task') {
+                  notificationMsg = `📥 <b>«${escapeHtml(title)}»</b> добавлен в <b>Распорядок (${time})</b> и <b>Задачи (${formatDate(due)})</b>!`;
+                } else if (target === 'routine') {
+                  notificationMsg = `⏱️ <b>«${escapeHtml(title)} (${time})»</b> добавлен в <b>Распорядок дня</b>!`;
+                } else {
+                  notificationMsg = `📌 Задача <b>«${escapeHtml(taskTitle)}»</b> сохранена в Focus OS!`;
+                }
+              }
+            }
+
+            saveState();
+            refreshCurrentView();
+            showNotification(notificationMsg);
+            triggerHaptic('success');
+            try {
+              window.history.replaceState({}, document.title, window.location.pathname);
+            } catch(e){}
           }
         } catch (e) {
           console.error("Import parse error:", e);
@@ -1207,9 +1808,10 @@
     // --- DASHBOARD (CLEANED UP: ONLY BURNING, ROUTINE, TODAY!) ---
     function renderDashboard() {
       const nowStr = new Date().toISOString().split('T')[0];
-      const todayTasks = tasks.filter(t => t.due === nowStr && !t.completed);
-      const todayTotal = tasks.filter(t => t.due === nowStr).length;
-      const todayDone = tasks.filter(t => t.due === nowStr && t.completed).length;
+      // Keep today's tasks AND all unfinished overdue tasks in the active plan so nothing is lost!
+      const todayTasks = tasks.filter(t => !t.completed && (t.due === nowStr || (t.due && t.due < nowStr)));
+      const todayTotal = tasks.filter(t => t.due === nowStr || (t.due && t.due < nowStr)).length;
+      const todayDone = tasks.filter(t => t.completed && (t.due === nowStr || (t.due && t.due < nowStr))).length;
       const todayPercent = todayTotal > 0 ? Math.round((todayDone / todayTotal) * 100) : 0;
 
       document.getElementById('stat-percent-today').textContent = `${todayPercent}%`;
@@ -1323,15 +1925,17 @@
 
     // Task Card
     function createTaskCardHTML(t, isBurning = false) {
-      const isOverdue = t.due && t.due < todayStr && !t.completed;
+      const nowStr = new Date().toISOString().split('T')[0];
+      const isOverdue = t.due && t.due < nowStr && !t.completed;
       const priorityBadge = getPriorityBadge(t.priority);
+      const overdueBadge = isOverdue ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-500/25 text-rose-300 border border-rose-500/40 flex items-center gap-0.5"><span>⚠️</span> Просрочено</span>' : '';
 
       return `
-        <div class="glass-card rounded-2xl p-3.5 border ${isBurning ? 'border-rose-500/30 bg-rose-500/5' : 'border-slate-800/80'} flex items-start justify-between space-x-3 transition-all">
-          <button onclick="completeTaskAndArchive('${t.id}')" title="Выполнить и перенести в архив" class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-xl border-2 border-slate-600 hover:border-emerald-400 hover:bg-emerald-500/20 flex items-center justify-center transition-all">
+        <div class="glass-card rounded-2xl p-3.5 border ${isOverdue ? 'border-rose-500/50 bg-rose-950/20 shadow-md shadow-rose-950/30' : (isBurning ? 'border-amber-500/30 bg-amber-500/5' : 'border-slate-800/80')} flex items-start justify-between space-x-3 transition-all">
+          <button onclick="completeTaskAndArchive('${t.id}')" title="Выполнить и перенести в архив" class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-xl border-2 ${isOverdue ? 'border-rose-500 hover:bg-rose-500/20' : 'border-slate-600 hover:border-emerald-400 hover:bg-emerald-500/20'} flex items-center justify-center transition-all">
           </button>
           
-          <div class="flex-1 min-w-0" onclick="completeTaskAndArchive('${t.id}')">
+          <div class="flex-1 min-w-0">
             <div class="flex items-center space-x-2">
               <span class="text-sm font-bold text-white">${escapeHtml(t.title)}</span>
             </div>
@@ -1339,6 +1943,7 @@
             
             <div class="flex flex-wrap items-center gap-1.5 mt-2">
               ${priorityBadge}
+              ${overdueBadge}
               ${t.category ? `<span class="px-2 py-0.5 rounded-md text-[10px] bg-slate-800 text-slate-300 font-medium">${t.category}</span>` : ''}
               ${t.due ? `
                 <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold flex items-center gap-1 ${isOverdue ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-slate-800/60 text-slate-400'}">
@@ -1376,22 +1981,49 @@
     }
 
     function restoreTaskFromHistory(id) {
-      triggerHaptic('light');
-      const t = tasks.find(x => x.id === id);
+      triggerHaptic('success');
+      const targetId = String(id);
+      const t = tasks.find(x => String(x.id) === targetId);
       if (t) {
         t.completed = false;
         t.completedAt = null;
+        // Move restored task to the very top so user sees it right away
+        tasks = [t, ...tasks.filter(x => String(x.id) !== targetId)];
         saveState();
-        renderHistoryModal();
-        refreshCurrentView();
+        closeHistoryModal();
+        currentTaskFilter = 'all';
+        switchTab('tasks');
+        showNotification(`↩️ Задача <b>«${escapeHtml(t.title)}»</b> успешно возвращена в активные!`);
+      } else {
+        showNotification("⚠️ Задача не найдена");
       }
     }
 
+    function restoreAllTasksFromHistory() {
+      triggerHaptic('success');
+      const completed = tasks.filter(t => t.completed);
+      if (completed.length === 0) return;
+      completed.forEach(t => {
+        t.completed = false;
+        t.completedAt = null;
+      });
+      saveState();
+      closeHistoryModal();
+      currentTaskFilter = 'all';
+      switchTab('tasks');
+      showNotification(`↩️ Все задачи (${completed.length}) возвращены в активные!`);
+    }
+
     function deleteTaskPermanently(id) {
+      const targetId = String(id);
+      const t = tasks.find(x => String(x.id) === targetId);
+      const title = t ? t.title : 'эту задачу';
+      if (!confirm(`Вы действительно хотите удалить задачу «${title}»?`)) return;
       triggerHaptic('heavy');
-      tasks = tasks.filter(t => t.id !== id);
+      tasks = tasks.filter(x => String(x.id) !== targetId);
       saveState();
       refreshCurrentView();
+      showNotification(`🗑️ Задача «${escapeHtml(title)}» удалена`);
     }
 
     // --- HISTORY MODAL ---
@@ -1430,7 +2062,7 @@
     function setTaskFilter(filter) {
       triggerHaptic('light');
       currentTaskFilter = filter;
-      ['all', 'burning', 'today', 'week'].forEach(f => {
+      ['all', 'overdue', 'burning', 'today', 'week'].forEach(f => {
         const btn = document.getElementById(`filter-pill-${f}`);
         if (btn) {
           btn.className = f === filter 
@@ -1449,12 +2081,14 @@
 
       let filtered = tasks.filter(t => !t.completed);
       if (search) filtered = filtered.filter(t => t.title.toLowerCase().includes(search) || t.note?.toLowerCase().includes(search));
-      if (currentTaskFilter === 'burning') filtered = filtered.filter(t => t.priority === 'p1' || (t.due && t.due <= nowStr));
-      else if (currentTaskFilter === 'today') filtered = filtered.filter(t => t.due === nowStr);
-      else if (currentTaskFilter === 'week') filtered = filtered.filter(t => t.due && t.due >= nowStr && t.due <= nextWeekStr);
+      
+      if (currentTaskFilter === 'overdue') filtered = filtered.filter(t => t.due && t.due < nowStr);
+      else if (currentTaskFilter === 'burning') filtered = filtered.filter(t => t.priority === 'p1' || (t.due && t.due <= nowStr));
+      else if (currentTaskFilter === 'today') filtered = filtered.filter(t => t.due === nowStr || (t.due && t.due < nowStr));
+      else if (currentTaskFilter === 'week') filtered = filtered.filter(t => (t.due && t.due <= nextWeekStr) || !t.due);
 
       if (filtered.length === 0) {
-        listEl.innerHTML = `<div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-sm">🔍 Активных задач нет</div>`;
+        listEl.innerHTML = `<div class="glass-card rounded-2xl p-8 text-center text-slate-400 text-sm">🔍 Задач по данному фильтру нет</div>`;
         return;
       }
       listEl.innerHTML = filtered.map(t => createTaskCardHTML(t)).join('');
@@ -1955,6 +2589,117 @@
       renderWishlistTab();
     }
 
+    // --- BACKUP & DATA RECOVERY MODAL ---
+    function openBackupModal() {
+      triggerHaptic('light');
+      const taskCount = (tasks || []).length;
+      const wishCount = (wishlist || []).length;
+      const habitCount = (habits || []).length;
+      const el = document.getElementById('backup-summary-stats');
+      if (el) {
+        el.textContent = `Задач: ${taskCount} • Хотелок: ${wishCount} • Привычек: ${habitCount}`;
+      }
+      document.getElementById('modal-backup').classList.remove('hidden');
+    }
+
+    function closeBackupModal() {
+      document.getElementById('modal-backup').classList.add('hidden');
+    }
+
+    function exportFullBackupJSON() {
+      triggerHaptic('medium');
+      try {
+        const fullBackup = {
+          app: "Focus OS",
+          version: "2.0",
+          exportDate: new Date().toISOString(),
+          data: {
+            tasks: tasks,
+            schedule: schedule,
+            homework: homework,
+            wishlist: wishlist,
+            habits: habits,
+            routine: routine,
+            gym: gym
+          }
+        };
+        const blob = new Blob([JSON.stringify(fullBackup, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const dateStr = new Date().toISOString().split('T')[0];
+        a.href = url;
+        a.download = `focus_os_backup_${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showNotification("💾 Бэкап успешно сохранён на устройство!");
+        triggerHaptic('success');
+      } catch (err) {
+        alert("Ошибка экспорта бэкапа: " + err.message);
+      }
+    }
+
+    function importBackupFile(event) {
+      triggerHaptic('medium');
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const data = parsed.data || parsed;
+          let count = 0;
+
+          if (data.tasks && Array.isArray(data.tasks)) {
+            tasks = data.tasks;
+            count += tasks.length;
+          }
+          if (data.wishlist && Array.isArray(data.wishlist)) {
+            wishlist = data.wishlist;
+            count += wishlist.length;
+          }
+          if (data.habits && Array.isArray(data.habits)) {
+            habits = data.habits;
+          }
+          if (data.routine && Array.isArray(data.routine)) {
+            routine = data.routine;
+          }
+          if (data.gym) {
+            gym = data.gym;
+          }
+          if (data.schedule) {
+            schedule = data.schedule;
+          }
+          if (data.homework && Array.isArray(data.homework)) {
+            homework = data.homework;
+          }
+
+          saveState();
+          refreshCurrentView();
+          closeBackupModal();
+          showNotification(`✅ Восстановлено успешно! (${count} задач и заметок)`);
+          triggerHaptic('success');
+        } catch (err) {
+          alert("Не удалось прочитать файл резервной копии: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function syncFromTelegramCloudManual() {
+      triggerHaptic('light');
+      if (!tg?.CloudStorage) {
+        showNotification("ℹ️ Облако Telegram активно в Mini App");
+        return;
+      }
+      syncFromTelegramCloud();
+      showNotification("🔄 Синхронизировано с Telegram Cloud!");
+      triggerHaptic('success');
+    }
+
     // --- POMODORO TIMER (CUSTOMIZABLE MINUTES!) (Solves Problem #2) ---
     let pomoInterval = null;
     let pomoSeconds = 25 * 60;
@@ -2231,22 +2976,33 @@
     }
     function closeTaskModal() { document.getElementById('modal-task').classList.add('hidden'); }
     function saveTaskFromModal() {
-      const title = document.getElementById('task-title-input').value.trim();
-      if (!title) return alert('Введите название');
-      tasks.unshift({
-        id: 't_' + Date.now(),
-        title,
-        note: document.getElementById('task-note-input').value.trim(),
-        priority: document.getElementById('task-priority-input').value,
-        due: document.getElementById('task-due-input').value,
-        category: document.getElementById('task-category-input').value,
+      const titleInput = document.getElementById('task-title-input');
+      const title = (titleInput?.value || '').trim();
+      if (!title) return alert('Введите название задачи');
+
+      const noteInput = document.getElementById('task-note-input');
+      const priorityInput = document.getElementById('task-priority-input');
+      const dueInput = document.getElementById('task-due-input');
+      const categoryInput = document.getElementById('task-category-input');
+
+      const newTask = {
+        id: 't_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+        title: title,
+        note: (noteInput?.value || '').trim(),
+        priority: priorityInput?.value || 'p2',
+        due: dueInput?.value || todayStr,
+        category: categoryInput?.value || 'Разное',
         completed: false,
         completedAt: null
-      });
+      };
+
+      tasks.unshift(newTask);
       saveState();
       closeTaskModal();
       triggerHaptic('success');
+      currentTaskFilter = 'all';
       refreshCurrentView();
+      showNotification(`✅ Задача <b>«${escapeHtml(title)}»</b> сохранена!`);
     }
 
     function refreshCurrentView() {
